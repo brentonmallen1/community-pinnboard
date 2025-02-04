@@ -29,16 +29,20 @@ const Index = () => {
             </div>
             
             <NavigationMenu className="hidden md:flex justify-center">
-              <NavigationMenuList>
+              <NavigationMenuList className="gap-2">
                 <NavigationMenuItem>
                   <NavigationMenuTrigger>Announcements</NavigationMenuTrigger>
-                  <NavigationMenuContent>
-                    <div className="p-4 w-[200px]">
-                      <NavigationMenuLink className="block py-2 hover:bg-gray-100 rounded px-3">
-                        Latest News
+                  <NavigationMenuContent className="absolute left-0">
+                    <div className="grid w-[200px] gap-1 p-2">
+                      <NavigationMenuLink asChild>
+                        <a className="block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground">
+                          Latest News
+                        </a>
                       </NavigationMenuLink>
-                      <NavigationMenuLink className="block py-2 hover:bg-gray-100 rounded px-3">
-                        Important Updates
+                      <NavigationMenuLink asChild>
+                        <a className="block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground">
+                          Important Updates
+                        </a>
                       </NavigationMenuLink>
                     </div>
                   </NavigationMenuContent>
@@ -46,13 +50,17 @@ const Index = () => {
                 
                 <NavigationMenuItem>
                   <NavigationMenuTrigger>Community Posts</NavigationMenuTrigger>
-                  <NavigationMenuContent>
-                    <div className="p-4 w-[200px]">
-                      <NavigationMenuLink className="block py-2 hover:bg-gray-100 rounded px-3">
-                        Browse Posts
+                  <NavigationMenuContent className="absolute left-0">
+                    <div className="grid w-[200px] gap-1 p-2">
+                      <NavigationMenuLink asChild>
+                        <a className="block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground">
+                          Browse Posts
+                        </a>
                       </NavigationMenuLink>
-                      <NavigationMenuLink className="block py-2 hover:bg-gray-100 rounded px-3">
-                        Submit Post
+                      <NavigationMenuLink asChild>
+                        <a className="block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground">
+                          Submit Post
+                        </a>
                       </NavigationMenuLink>
                     </div>
                   </NavigationMenuContent>
@@ -60,13 +68,17 @@ const Index = () => {
                 
                 <NavigationMenuItem>
                   <NavigationMenuTrigger>Events</NavigationMenuTrigger>
-                  <NavigationMenuContent>
-                    <div className="p-4 w-[200px]">
-                      <NavigationMenuLink className="block py-2 hover:bg-gray-100 rounded px-3">
-                        Calendar
+                  <NavigationMenuContent className="absolute left-0">
+                    <div className="grid w-[200px] gap-1 p-2">
+                      <NavigationMenuLink asChild>
+                        <a className="block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground">
+                          Calendar
+                        </a>
                       </NavigationMenuLink>
-                      <NavigationMenuLink className="block py-2 hover:bg-gray-100 rounded px-3">
-                        Upcoming Events
+                      <NavigationMenuLink asChild>
+                        <a className="block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground">
+                          Upcoming Events
+                        </a>
                       </NavigationMenuLink>
                     </div>
                   </NavigationMenuContent>
@@ -74,13 +86,17 @@ const Index = () => {
                 
                 <NavigationMenuItem>
                   <NavigationMenuTrigger>Resources</NavigationMenuTrigger>
-                  <NavigationMenuContent>
-                    <div className="p-4 w-[200px]">
-                      <NavigationMenuLink className="block py-2 hover:bg-gray-100 rounded px-3">
-                        Helpful Links
+                  <NavigationMenuContent className="absolute left-0">
+                    <div className="grid w-[200px] gap-1 p-2">
+                      <NavigationMenuLink asChild>
+                        <a className="block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground">
+                          Helpful Links
+                        </a>
                       </NavigationMenuLink>
-                      <NavigationMenuLink className="block py-2 hover:bg-gray-100 rounded px-3">
-                        Contact
+                      <NavigationMenuLink asChild>
+                        <a className="block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground">
+                          Contact
+                        </a>
                       </NavigationMenuLink>
                     </div>
                   </NavigationMenuContent>
