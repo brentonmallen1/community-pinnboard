@@ -1,4 +1,6 @@
 import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import * as z from "zod";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -13,17 +15,22 @@ import {
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
+import { useNavigate } from "react-router-dom";
 
-interface PostFormData {
-  title: string;
-  content: string;
-}
+const postSchema = z.object({
+  title: z.string().min(1, "Title is required").max(100, "Title is too long"),
+  content: z.string().min(1, "Content is required").max(2000, "Content is too long"),
+});
+
+type PostFormData = z.infer<typeof postSchema>;
 
 export function SubmitPostForm() {
   const { user } = useAuth();
   const { toast } = useToast();
+  const navigate = useNavigate();
   
   const form = useForm<PostFormData>({
+    resolver: zodResolver(postSchema),
     defaultValues: {
       title: "",
       content: "",
@@ -31,7 +38,14 @@ export function SubmitPostForm() {
   });
 
   const onSubmit = async (data: PostFormData) => {
-    if (!user) return;
+    if (!user) {
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: "You must be logged in to submit a post.",
+      });
+      return;
+    }
 
     try {
       const { error } = await supabase.from("community_posts").insert({
@@ -48,6 +62,7 @@ export function SubmitPostForm() {
       });
 
       form.reset();
+      navigate("/browse-posts");
     } catch (error) {
       console.error("Error submitting post:", error);
       toast({
