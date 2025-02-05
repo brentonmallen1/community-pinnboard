@@ -4,6 +4,8 @@ import { Menu, LogIn, LogOut } from "lucide-react";
 import { useState } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 import { Link, useNavigate } from "react-router-dom";
+import { SubmitPostForm } from "@/components/posts/SubmitPostForm";
+import { PendingPosts } from "@/components/posts/PendingPosts";
 
 const Index = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -17,6 +19,8 @@ const Index = () => {
       navigate("/auth");
     }
   };
+
+  const isModeratorOrAdmin = profile?.role === "board_member" || profile?.role === "admin";
 
   return (
     <div className="min-h-screen bg-[#f3f3f3]">
@@ -178,6 +182,20 @@ const Index = () => {
         <div className="grid grid-cols-1 md:grid-cols-12 gap-8">
           {/* Main Content Area */}
           <div className="md:col-span-8">
+            {user && (
+              <div className="bg-white rounded-lg shadow p-6 mb-6">
+                <h2 className="text-2xl font-serif font-bold mb-4">Submit a Post</h2>
+                <SubmitPostForm />
+              </div>
+            )}
+
+            {isModeratorOrAdmin && (
+              <div className="bg-white rounded-lg shadow p-6 mb-6">
+                <h2 className="text-2xl font-serif font-bold mb-4">Pending Posts</h2>
+                <PendingPosts />
+              </div>
+            )}
+
             <div className="bg-white rounded-lg shadow p-6">
               <h2 className="text-2xl font-serif font-bold mb-4">Latest Announcements</h2>
               <p className="text-gray-600">Welcome to our community bulletin board! Stay updated with the latest announcements, events, and community posts.</p>
