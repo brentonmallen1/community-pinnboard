@@ -2,7 +2,7 @@ import { NavigationMenu, NavigationMenuContent, NavigationMenuItem, NavigationMe
 import { Button } from "@/components/ui/button";
 import { Menu, LogIn, LogOut } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 
 interface HeaderProps {
   isMobileMenuOpen: boolean;
@@ -11,14 +11,19 @@ interface HeaderProps {
 }
 
 export const Header = ({ isMobileMenuOpen, setIsMobileMenuOpen, handleAuthClick }: HeaderProps) => {
-  const { user } = useAuth();
+  const { user, profile } = useAuth();
+  const navigate = useNavigate();
+  const isModeratorOrAdmin = profile?.role === "board_member" || profile?.role === "admin";
+  const isAdmin = profile?.role === "admin";
 
   return (
     <header className="bg-white border-b border-gray-200">
       <div className="container mx-auto px-4">
         <div className="py-6 text-center">
-          <h1 className="text-4xl font-serif font-bold text-gray-900">Community Bulletin Board</h1>
-          <p className="mt-2 text-gray-600">Your Source for Local Updates and Announcements</p>
+          <Link to="/" className="hover:opacity-80">
+            <h1 className="text-4xl font-serif font-bold text-gray-900">Community Bulletin Board</h1>
+            <p className="mt-2 text-gray-600">Your Source for Local Updates and Announcements</p>
+          </Link>
         </div>
         
         <nav className="py-4">
@@ -43,36 +48,25 @@ export const Header = ({ isMobileMenuOpen, setIsMobileMenuOpen, handleAuthClick 
             <NavigationMenu>
               <NavigationMenuList className="gap-2">
                 <NavigationMenuItem>
-                  <NavigationMenuTrigger>Announcements</NavigationMenuTrigger>
+                  <NavigationMenuTrigger>Posts</NavigationMenuTrigger>
                   <NavigationMenuContent className="min-w-[200px]">
                     <div className="grid gap-1 p-2">
                       <NavigationMenuLink asChild>
-                        <Link to="/" className="block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground">
-                          Latest News
-                        </Link>
-                      </NavigationMenuLink>
-                      <NavigationMenuLink asChild>
-                        <Link to="/" className="block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground">
-                          Important Updates
-                        </Link>
-                      </NavigationMenuLink>
-                    </div>
-                  </NavigationMenuContent>
-                </NavigationMenuItem>
-                
-                <NavigationMenuItem>
-                  <NavigationMenuTrigger>Community Posts</NavigationMenuTrigger>
-                  <NavigationMenuContent className="min-w-[200px]">
-                    <div className="grid gap-1 p-2">
-                      <NavigationMenuLink asChild>
-                        <Link to="/" className="block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground">
+                        <Link to="/posts" className="block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground">
                           Browse Posts
                         </Link>
                       </NavigationMenuLink>
                       {user && (
                         <NavigationMenuLink asChild>
-                          <Link to="/" className="block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground">
+                          <Link to="/dashboard" className="block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground">
                             Submit Post
+                          </Link>
+                        </NavigationMenuLink>
+                      )}
+                      {isModeratorOrAdmin && (
+                        <NavigationMenuLink asChild>
+                          <Link to="/dashboard" className="block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground">
+                            Manage Posts
                           </Link>
                         </NavigationMenuLink>
                       )}
@@ -115,6 +109,16 @@ export const Header = ({ isMobileMenuOpen, setIsMobileMenuOpen, handleAuthClick 
                     </div>
                   </NavigationMenuContent>
                 </NavigationMenuItem>
+
+                {isAdmin && (
+                  <NavigationMenuItem>
+                    <NavigationMenuLink asChild>
+                      <Link to="/admin/settings" className="block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground">
+                        Settings
+                      </Link>
+                    </NavigationMenuLink>
+                  </NavigationMenuItem>
+                )}
               </NavigationMenuList>
             </NavigationMenu>
 

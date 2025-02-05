@@ -150,6 +150,27 @@ export type Database = {
           },
         ]
       }
+      community_settings: {
+        Row: {
+          community_name: string
+          created_at: string
+          id: string
+          updated_at: string
+        }
+        Insert: {
+          community_name?: string
+          created_at?: string
+          id?: string
+          updated_at?: string
+        }
+        Update: {
+          community_name?: string
+          created_at?: string
+          id?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       events: {
         Row: {
           author_id: string
