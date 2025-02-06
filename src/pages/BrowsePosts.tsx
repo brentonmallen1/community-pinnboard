@@ -18,9 +18,10 @@ const BrowsePosts = () => {
   const queryClient = useQueryClient();
   const isModeratorOrAdmin = profile?.role === "board_member" || profile?.role === "admin";
 
-  const { data: posts, isLoading } = useQuery({
+  const { data: posts, isLoading, error } = useQuery({
     queryKey: ["posts", searchTerm],
     queryFn: async () => {
+      console.log("Fetching posts with search term:", searchTerm);
       const query = supabase
         .from("community_posts")
         .select(`
@@ -36,9 +37,14 @@ const BrowsePosts = () => {
       }
 
       const { data, error } = await query;
-      if (error) throw error;
+      if (error) {
+        console.error("Error fetching posts:", error);
+        throw error;
+      }
+      console.log("Fetched posts:", data);
       return data;
     },
+    enabled: true // Always enabled since we want to show public posts
   });
 
   const handleDelete = async (postId: string) => {
@@ -57,7 +63,6 @@ const BrowsePosts = () => {
         description: "The post has been removed.",
       });
 
-      // Refresh the posts list
       queryClient.invalidateQueries({ queryKey: ["posts"] });
     } catch (error) {
       console.error("Error deleting post:", error);
@@ -69,8 +74,9 @@ const BrowsePosts = () => {
     }
   };
 
-  if (isLoading) {
-    return <div>Loading...</div>;
+  if (error) {
+    console.error("Error in posts query:", error);
+    return <div>Error loading posts. Please try again later.</div>;
   }
 
   return (
@@ -95,32 +101,36 @@ const BrowsePosts = () => {
             />
           </div>
 
-          <div className="grid gap-6">
-            {posts?.length === 0 ? (
-              <p className="text-center text-gray-500">No posts found.</p>
-            ) : (
-              posts?.map((post) => (
-                <Card key={post.id}>
-                  <CardHeader>
-                    <CardTitle>{post.title}</CardTitle>
-                    <p className="text-sm text-gray-500">
-                      By {post.profiles.email} • {new Date(post.created_at).toLocaleDateString()}
-                    </p>
-                  </CardHeader>
-                  <CardContent>
-                    <p className="mb-4 whitespace-pre-wrap">{post.content}</p>
-                    {isModeratorOrAdmin && (
-                      <div className="flex gap-2">
-                        <Button variant="destructive" onClick={() => handleDelete(post.id)}>
-                          Delete
-                        </Button>
-                      </div>
-                    )}
-                  </CardContent>
-                </Card>
-              ))
-            )}
-          </div>
+          {isLoading ? (
+            <div className="text-center py-8">Loading posts...</div>
+          ) : (
+            <div className="grid gap-6">
+              {!posts || posts.length === 0 ? (
+                <p className="text-center text-gray-500">No posts found.</p>
+              ) : (
+                posts.map((post) => (
+                  <Card key={post.id}>
+                    <CardHeader>
+                      <CardTitle>{post.title}</CardTitle>
+                      <p className="text-sm text-gray-500">
+                        By {post.profiles.email} • {new Date(post.created_at).toLocaleDateString()}
+                      </p>
+                    </CardHeader>
+                    <CardContent>
+                      <p className="mb-4 whitespace-pre-wrap">{post.content}</p>
+                      {isModeratorOrAdmin && (
+                        <div className="flex gap-2">
+                          <Button variant="destructive" onClick={() => handleDelete(post.id)}>
+                            Delete
+                          </Button>
+                        </div>
+                      )}
+                    </CardContent>
+                  </Card>
+                ))
+              )}
+            </div>
+          )}
         </div>
       </main>
     </div>

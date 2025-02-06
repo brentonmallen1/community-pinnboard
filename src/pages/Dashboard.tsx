@@ -1,5 +1,6 @@
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import { Header } from "@/components/layout/Header";
 import { MobileMenu } from "@/components/layout/MobileMenu";
@@ -9,10 +10,17 @@ import { PendingPosts } from "@/components/posts/PendingPosts";
 const Dashboard = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const { user, profile, signOut } = useAuth();
+  const navigate = useNavigate();
   const isModeratorOrAdmin = profile?.role === "board_member" || profile?.role === "admin";
 
+  useEffect(() => {
+    if (!user) {
+      navigate("/auth");
+    }
+  }, [user, navigate]);
+
+  // Don't render anything while checking auth status
   if (!user) {
-    window.location.href = "/auth";
     return null;
   }
 
