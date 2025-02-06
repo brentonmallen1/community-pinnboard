@@ -1,6 +1,7 @@
+
 import { NavigationMenu, NavigationMenuContent, NavigationMenuItem, NavigationMenuLink, NavigationMenuList, NavigationMenuTrigger } from "@/components/ui/navigation-menu";
 import { Button } from "@/components/ui/button";
-import { Menu, LogIn, LogOut } from "lucide-react";
+import { Menu, LogIn, LogOut, Home } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { Link, useNavigate } from "react-router-dom";
 
@@ -28,13 +29,22 @@ export const Header = ({ isMobileMenuOpen, setIsMobileMenuOpen, handleAuthClick 
         
         <nav className="py-4">
           <div className="flex justify-between items-center md:hidden">
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-            >
-              <Menu className="h-6 w-6" />
-            </Button>
+            <div className="flex items-center gap-2">
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+              >
+                <Menu className="h-6 w-6" />
+              </Button>
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={() => navigate("/")}
+              >
+                <Home className="h-6 w-6" />
+              </Button>
+            </div>
             <Button
               variant="ghost"
               size="icon"
@@ -45,82 +55,92 @@ export const Header = ({ isMobileMenuOpen, setIsMobileMenuOpen, handleAuthClick 
           </div>
           
           <div className="hidden md:flex justify-between items-center">
-            <NavigationMenu>
-              <NavigationMenuList className="gap-2">
-                <NavigationMenuItem>
-                  <NavigationMenuTrigger>Posts</NavigationMenuTrigger>
-                  <NavigationMenuContent className="min-w-[200px]">
-                    <div className="grid gap-1 p-2">
-                      <NavigationMenuLink asChild>
-                        <Link to="/posts" className="block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground">
-                          Browse Posts
-                        </Link>
-                      </NavigationMenuLink>
-                      {user && (
-                        <NavigationMenuLink asChild>
-                          <Link to="/dashboard" className="block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground">
-                            Submit Post
-                          </Link>
-                        </NavigationMenuLink>
-                      )}
-                      {isModeratorOrAdmin && (
-                        <NavigationMenuLink asChild>
-                          <Link to="/dashboard" className="block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground">
-                            Manage Posts
-                          </Link>
-                        </NavigationMenuLink>
-                      )}
-                    </div>
-                  </NavigationMenuContent>
-                </NavigationMenuItem>
-                
-                <NavigationMenuItem>
-                  <NavigationMenuTrigger>Events</NavigationMenuTrigger>
-                  <NavigationMenuContent className="min-w-[200px]">
-                    <div className="grid gap-1 p-2">
-                      <NavigationMenuLink asChild>
-                        <Link to="/" className="block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground">
-                          Calendar
-                        </Link>
-                      </NavigationMenuLink>
-                      <NavigationMenuLink asChild>
-                        <Link to="/" className="block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground">
-                          Upcoming Events
-                        </Link>
-                      </NavigationMenuLink>
-                    </div>
-                  </NavigationMenuContent>
-                </NavigationMenuItem>
-                
-                <NavigationMenuItem>
-                  <NavigationMenuTrigger>Resources</NavigationMenuTrigger>
-                  <NavigationMenuContent className="min-w-[200px]">
-                    <div className="grid gap-1 p-2">
-                      <NavigationMenuLink asChild>
-                        <Link to="/" className="block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground">
-                          Helpful Links
-                        </Link>
-                      </NavigationMenuLink>
-                      <NavigationMenuLink asChild>
-                        <Link to="/" className="block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground">
-                          Contact
-                        </Link>
-                      </NavigationMenuLink>
-                    </div>
-                  </NavigationMenuContent>
-                </NavigationMenuItem>
-
-                {isAdmin && (
+            <div className="flex items-center gap-2">
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={() => navigate("/")}
+                className="mr-2"
+              >
+                <Home className="h-5 w-5" />
+              </Button>
+              <NavigationMenu>
+                <NavigationMenuList className="gap-2">
                   <NavigationMenuItem>
-                    <NavigationMenuLink asChild>
-                      <Link to="/admin/settings" className="block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground">
-                        Settings
-                      </Link>
-                    </NavigationMenuLink>
+                    <NavigationMenuTrigger>Posts</NavigationMenuTrigger>
+                    <NavigationMenuContent className="min-w-[200px]">
+                      <div className="grid gap-1 p-2">
+                        <NavigationMenuLink asChild>
+                          <Link to="/posts" className="block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground">
+                            Browse Posts
+                          </Link>
+                        </NavigationMenuLink>
+                        {user && (
+                          <NavigationMenuLink asChild>
+                            <Link to="/dashboard" className="block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground">
+                              Submit Post
+                            </Link>
+                          </NavigationMenuLink>
+                        )}
+                        {isModeratorOrAdmin && (
+                          <NavigationMenuLink asChild>
+                            <Link to="/dashboard" className="block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground">
+                              Manage Posts
+                            </Link>
+                          </NavigationMenuLink>
+                        )}
+                      </div>
+                    </NavigationMenuContent>
                   </NavigationMenuItem>
-                )}
-              </NavigationMenuList>
-            </NavigationMenu>
+                  
+                  <NavigationMenuItem>
+                    <NavigationMenuTrigger>Events</NavigationMenuTrigger>
+                    <NavigationMenuContent className="min-w-[200px]">
+                      <div className="grid gap-1 p-2">
+                        <NavigationMenuLink asChild>
+                          <Link to="/" className="block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground">
+                            Calendar
+                          </Link>
+                        </NavigationMenuLink>
+                        <NavigationMenuLink asChild>
+                          <Link to="/" className="block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground">
+                            Upcoming Events
+                          </Link>
+                        </NavigationMenuLink>
+                      </div>
+                    </NavigationMenuContent>
+                  </NavigationMenuItem>
+                  
+                  <NavigationMenuItem>
+                    <NavigationMenuTrigger>Resources</NavigationMenuTrigger>
+                    <NavigationMenuContent className="min-w-[200px]">
+                      <div className="grid gap-1 p-2">
+                        <NavigationMenuLink asChild>
+                          <Link to="/" className="block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground">
+                            Helpful Links
+                          </Link>
+                        </NavigationMenuLink>
+                        <NavigationMenuLink asChild>
+                          <Link to="/" className="block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground">
+                            Contact
+                          </Link>
+                        </NavigationMenuLink>
+                      </div>
+                    </NavigationMenuContent>
+                  </NavigationMenuItem>
+
+                  {isAdmin && (
+                    <NavigationMenuItem>
+                      <NavigationMenuLink asChild>
+                        <Link to="/admin/settings" className="block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground">
+                          Settings
+                        </Link>
+                      </NavigationMenuLink>
+                    </NavigationMenuItem>
+                  )}
+                </NavigationMenuList>
+              </NavigationMenu>
+            </div>
 
             <Button
               variant="ghost"

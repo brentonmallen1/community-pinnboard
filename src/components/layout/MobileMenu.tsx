@@ -1,6 +1,8 @@
+
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/contexts/AuthContext";
 import { Link } from "react-router-dom";
+import { Home } from "lucide-react";
 
 interface MobileMenuProps {
   isOpen: boolean;
@@ -16,6 +18,13 @@ export const MobileMenu = ({ isOpen }: MobileMenuProps) => {
   return (
     <div className="md:hidden mt-4">
       <div className="flex flex-col space-y-2">
+        <Link to="/">
+          <Button variant="ghost" className="w-full text-left justify-start">
+            <Home className="h-4 w-4 mr-2" />
+            Home
+          </Button>
+        </Link>
+
         <Link to="/posts">
           <Button variant="ghost" className="w-full text-left justify-start">
             Browse Posts
