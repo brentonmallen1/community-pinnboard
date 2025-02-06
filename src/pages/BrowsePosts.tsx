@@ -9,6 +9,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
+import { Link } from "react-router-dom";
 
 const BrowsePosts = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -44,7 +45,6 @@ const BrowsePosts = () => {
       console.log("Fetched posts:", data);
       return data;
     },
-    enabled: true // Always enabled since we want to show public posts
   });
 
   const handleDelete = async (postId: string) => {
@@ -90,8 +90,15 @@ const BrowsePosts = () => {
 
       <main className="container mx-auto px-4 py-8">
         <div className="space-y-8">
-          <div className="flex justify-between items-center">
-            <h1 className="text-3xl font-serif font-bold">Community Posts</h1>
+          <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+            <div>
+              <h1 className="text-3xl font-serif font-bold">Community Posts</h1>
+              {user && (
+                <Link to="/dashboard" className="text-blue-600 hover:text-blue-800">
+                  Go to Dashboard to Submit or Manage Posts
+                </Link>
+              )}
+            </div>
             <Input
               type="search"
               placeholder="Search posts..."
@@ -102,7 +109,10 @@ const BrowsePosts = () => {
           </div>
 
           {isLoading ? (
-            <div className="text-center py-8">Loading posts...</div>
+            <div className="text-center py-8">
+              <div className="animate-spin h-8 w-8 border-4 border-blue-500 border-t-transparent rounded-full mx-auto mb-4"></div>
+              Loading posts...
+            </div>
           ) : (
             <div className="grid gap-6">
               {!posts || posts.length === 0 ? (
