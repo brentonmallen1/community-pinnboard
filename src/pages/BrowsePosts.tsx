@@ -23,7 +23,7 @@ const BrowsePosts = () => {
     queryKey: ["posts", searchTerm],
     queryFn: async () => {
       console.log("Fetching posts with search term:", searchTerm);
-      const query = supabase
+      let query = supabase
         .from("community_posts")
         .select(`
           *,
@@ -34,17 +34,25 @@ const BrowsePosts = () => {
         .eq("status", "approved");
 
       if (searchTerm) {
-        query.or(`title.ilike.%${searchTerm}%,content.ilike.%${searchTerm}%`);
+        query = query.or(`title.ilike.%${searchTerm}%,content.ilike.%${searchTerm}%`);
       }
 
       const { data, error } = await query;
+      
       if (error) {
         console.error("Error fetching posts:", error);
         throw error;
       }
+      
+      if (!data) {
+        console.log("No posts found");
+        return [];
+      }
+      
       console.log("Fetched posts:", data);
       return data;
     },
+    retry: 1,
   });
 
   const handleDelete = async (postId: string) => {
@@ -76,7 +84,22 @@ const BrowsePosts = () => {
 
   if (error) {
     console.error("Error in posts query:", error);
-    return <div>Error loading posts. Please try again later.</div>;
+    return (
+      <div className="min-h-screen bg-[#f3f3f3]">
+        <Header 
+          isMobileMenuOpen={isMobileMenuOpen}
+          setIsMobileMenuOpen={setIsMobileMenuOpen}
+          handleAuthClick={signOut}
+        />
+        <MobileMenu isOpen={isMobileMenuOpen} />
+        <main className="container mx-auto px-4 py-8">
+          <div className="text-center text-red-600">
+            Error loading posts. Please try again later.
+            <pre className="mt-2 text-sm">{JSON.stringify(error, null, 2)}</pre>
+          </div>
+        </main>
+      </div>
+    );
   }
 
   return (
