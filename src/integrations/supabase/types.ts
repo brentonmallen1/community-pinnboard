@@ -118,7 +118,7 @@ export type Database = {
           content: string
           created_at: string
           id: string
-          status: Database["public"]["Enums"]["post_status"] | null
+          status: Database["public"]["Enums"]["post_status"]
           title: string
           updated_at: string
         }
@@ -127,7 +127,7 @@ export type Database = {
           content: string
           created_at?: string
           id?: string
-          status?: Database["public"]["Enums"]["post_status"] | null
+          status?: Database["public"]["Enums"]["post_status"]
           title: string
           updated_at?: string
         }
@@ -136,7 +136,7 @@ export type Database = {
           content?: string
           created_at?: string
           id?: string
-          status?: Database["public"]["Enums"]["post_status"] | null
+          status?: Database["public"]["Enums"]["post_status"]
           title?: string
           updated_at?: string
         }
