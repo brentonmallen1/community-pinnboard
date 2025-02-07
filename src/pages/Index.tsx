@@ -2,23 +2,35 @@
 import { useState } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 import { useNavigate } from "react-router-dom";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { Header } from "@/components/layout/Header";
 import { MobileMenu } from "@/components/layout/MobileMenu";
 import { Sidebar } from "@/components/layout/Sidebar";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle, CardFooter } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
 import { supabase } from "@/integrations/supabase/client";
+import { useToast } from "@/hooks/use-toast";
+import { Edit, Trash, Plus } from "lucide-react";
 
 const Index = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  const { user, signOut } = useAuth();
+  const [isAddAnnouncementOpen, setIsAddAnnouncementOpen] = useState(false);
+  const [isEditAnnouncementOpen, setIsEditAnnouncementOpen] = useState(false);
+  const [selectedAnnouncement, setSelectedAnnouncement] = useState<any>(null);
+  const [title, setTitle] = useState("");
+  const [content, setContent] = useState("");
+  const { user, profile, signOut } = useAuth();
   const navigate = useNavigate();
+  const { toast } = useToast();
+  const queryClient = useQueryClient();
+  const isModeratorOrAdmin = profile?.role === "board_member" || profile?.role === "admin";
 
-  const { data: posts, isLoading, error } = useQuery({
+  const { data: posts, isLoading: isLoadingPosts } = useQuery({
     queryKey: ["approved-posts"],
     queryFn: async () => {
-      console.log("Fetching approved posts...");
       const { data, error } = await supabase
         .from("community_posts")
         .select(`
@@ -31,13 +43,107 @@ const Index = () => {
         .order("created_at", { ascending: false })
         .limit(5);
 
-      if (error) {
-        console.error("Error fetching posts:", error);
-        throw error;
-      }
-      
-      console.log("Fetched posts:", data);
+      if (error) throw error;
       return data;
+    },
+  });
+
+  const { data: announcements, isLoading: isLoadingAnnouncements } = useQuery({
+    queryKey: ["announcements"],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("announcements")
+        .select(`
+          *,
+          profiles (
+            email
+          )
+        `)
+        .order("created_at", { ascending: false });
+
+      if (error) throw error;
+      return data;
+    },
+  });
+
+  const createAnnouncement = useMutation({
+    mutationFn: async () => {
+      const { error } = await supabase
+        .from("announcements")
+        .insert([{ title, content, author_id: user?.id }]);
+      
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["announcements"] });
+      setIsAddAnnouncementOpen(false);
+      setTitle("");
+      setContent("");
+      toast({
+        title: "Success",
+        description: "Announcement created successfully",
+      });
+    },
+    onError: (error) => {
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: "Failed to create announcement",
+      });
+    },
+  });
+
+  const updateAnnouncement = useMutation({
+    mutationFn: async () => {
+      const { error } = await supabase
+        .from("announcements")
+        .update({ title, content })
+        .eq("id", selectedAnnouncement.id);
+      
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["announcements"] });
+      setIsEditAnnouncementOpen(false);
+      setSelectedAnnouncement(null);
+      setTitle("");
+      setContent("");
+      toast({
+        title: "Success",
+        description: "Announcement updated successfully",
+      });
+    },
+    onError: (error) => {
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: "Failed to update announcement",
+      });
+    },
+  });
+
+  const deleteAnnouncement = useMutation({
+    mutationFn: async (id: string) => {
+      const { error } = await supabase
+        .from("announcements")
+        .delete()
+        .eq("id", id);
+      
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["announcements"] });
+      toast({
+        title: "Success",
+        description: "Announcement deleted successfully",
+      });
+    },
+    onError: (error) => {
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: "Failed to delete announcement",
+      });
     },
   });
 
@@ -47,6 +153,13 @@ const Index = () => {
     } else {
       navigate("/auth");
     }
+  };
+
+  const handleEditAnnouncement = (announcement: any) => {
+    setSelectedAnnouncement(announcement);
+    setTitle(announcement.title);
+    setContent(announcement.content);
+    setIsEditAnnouncementOpen(true);
   };
 
   return (
@@ -62,6 +175,123 @@ const Index = () => {
         <div className="grid grid-cols-1 md:grid-cols-12 gap-8">
           <div className="md:col-span-8">
             <div className="space-y-6">
+              {/* Announcements Section */}
+              <div>
+                <div className="flex justify-between items-center mb-4">
+                  <h2 className="text-2xl font-serif font-bold">Announcements</h2>
+                  {isModeratorOrAdmin && (
+                    <Dialog open={isAddAnnouncementOpen} onOpenChange={setIsAddAnnouncementOpen}>
+                      <DialogTrigger asChild>
+                        <Button>
+                          <Plus className="h-4 w-4 mr-2" />
+                          New Announcement
+                        </Button>
+                      </DialogTrigger>
+                      <DialogContent>
+                        <DialogHeader>
+                          <DialogTitle>Create New Announcement</DialogTitle>
+                        </DialogHeader>
+                        <div className="space-y-4 mt-4">
+                          <Input
+                            placeholder="Title"
+                            value={title}
+                            onChange={(e) => setTitle(e.target.value)}
+                          />
+                          <Textarea
+                            placeholder="Content"
+                            value={content}
+                            onChange={(e) => setContent(e.target.value)}
+                            className="min-h-[100px]"
+                          />
+                          <Button 
+                            onClick={() => createAnnouncement.mutate()}
+                            disabled={!title || !content}
+                          >
+                            Create Announcement
+                          </Button>
+                        </div>
+                      </DialogContent>
+                    </Dialog>
+                  )}
+                </div>
+
+                {isLoadingAnnouncements ? (
+                  <div className="text-center py-8">
+                    <div className="animate-spin h-8 w-8 border-4 border-blue-500 border-t-transparent rounded-full mx-auto mb-4"></div>
+                    Loading announcements...
+                  </div>
+                ) : !announcements || announcements.length === 0 ? (
+                  <Card>
+                    <CardContent className="p-6 text-center text-gray-500">
+                      No announcements available at this time.
+                    </CardContent>
+                  </Card>
+                ) : (
+                  <div className="space-y-4">
+                    {announcements.map((announcement) => (
+                      <Card key={announcement.id}>
+                        <CardHeader>
+                          <CardTitle>{announcement.title}</CardTitle>
+                          <p className="text-sm text-gray-500">
+                            By {announcement.profiles.email} • {new Date(announcement.created_at).toLocaleDateString()}
+                          </p>
+                        </CardHeader>
+                        <CardContent>
+                          <p>{announcement.content}</p>
+                        </CardContent>
+                        {isModeratorOrAdmin && announcement.author_id === user?.id && (
+                          <CardFooter className="justify-end space-x-2">
+                            <Button
+                              variant="outline"
+                              size="icon"
+                              onClick={() => handleEditAnnouncement(announcement)}
+                            >
+                              <Edit className="h-4 w-4" />
+                            </Button>
+                            <Button
+                              variant="outline"
+                              size="icon"
+                              onClick={() => deleteAnnouncement.mutate(announcement.id)}
+                            >
+                              <Trash className="h-4 w-4" />
+                            </Button>
+                          </CardFooter>
+                        )}
+                      </Card>
+                    ))}
+                  </div>
+                )}
+
+                {/* Edit Announcement Dialog */}
+                <Dialog open={isEditAnnouncementOpen} onOpenChange={setIsEditAnnouncementOpen}>
+                  <DialogContent>
+                    <DialogHeader>
+                      <DialogTitle>Edit Announcement</DialogTitle>
+                    </DialogHeader>
+                    <div className="space-y-4 mt-4">
+                      <Input
+                        placeholder="Title"
+                        value={title}
+                        onChange={(e) => setTitle(e.target.value)}
+                      />
+                      <Textarea
+                        placeholder="Content"
+                        value={content}
+                        onChange={(e) => setContent(e.target.value)}
+                        className="min-h-[100px]"
+                      />
+                      <Button 
+                        onClick={() => updateAnnouncement.mutate()}
+                        disabled={!title || !content}
+                      >
+                        Update Announcement
+                      </Button>
+                    </div>
+                  </DialogContent>
+                </Dialog>
+              </div>
+
+              {/* Posts Section */}
               <div className="flex justify-between items-center">
                 <h2 className="text-2xl font-serif font-bold">Latest Posts</h2>
                 {posts && posts.length > 0 && (
@@ -71,17 +301,11 @@ const Index = () => {
                 )}
               </div>
 
-              {isLoading ? (
+              {isLoadingPosts ? (
                 <div className="text-center py-8">
                   <div className="animate-spin h-8 w-8 border-4 border-blue-500 border-t-transparent rounded-full mx-auto mb-4"></div>
                   Loading posts...
                 </div>
-              ) : error ? (
-                <Card>
-                  <CardContent className="p-6 text-center text-red-500">
-                    Error loading posts. Please try again later.
-                  </CardContent>
-                </Card>
               ) : !posts || posts.length === 0 ? (
                 <Card>
                   <CardContent className="p-6 text-center text-gray-500">
