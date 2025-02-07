@@ -1,11 +1,13 @@
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import { Header } from "@/components/layout/Header";
 import { MobileMenu } from "@/components/layout/MobileMenu";
-import { SubmitPostForm } from "@/components/posts/SubmitPostForm";
 import { PendingPosts } from "@/components/posts/PendingPosts";
+import { ManageAnnouncements } from "@/components/announcements/ManageAnnouncements";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { ManageApprovedPosts } from "@/components/posts/ManageApprovedPosts";
 
 const Dashboard = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -13,14 +15,13 @@ const Dashboard = () => {
   const navigate = useNavigate();
   const isModeratorOrAdmin = profile?.role === "board_member" || profile?.role === "admin";
 
-  useEffect(() => {
-    if (!user) {
-      navigate("/auth");
-    }
-  }, [user, navigate]);
-
-  // Don't render anything while checking auth status
   if (!user) {
+    navigate("/auth");
+    return null;
+  }
+
+  if (!isModeratorOrAdmin) {
+    navigate("/");
     return null;
   }
 
@@ -34,19 +35,31 @@ const Dashboard = () => {
       <MobileMenu isOpen={isMobileMenuOpen} />
 
       <main className="container mx-auto px-4 py-8">
-        <div className="space-y-8">
-          <div className="bg-white rounded-lg shadow p-6">
-            <h2 className="text-2xl font-serif font-bold mb-4">Submit a Post</h2>
-            <SubmitPostForm />
-          </div>
+        <Tabs defaultValue="posts" className="space-y-6">
+          <TabsList>
+            <TabsTrigger value="posts">Manage Posts</TabsTrigger>
+            <TabsTrigger value="announcements">Manage Announcements</TabsTrigger>
+          </TabsList>
 
-          {isModeratorOrAdmin && (
+          <TabsContent value="posts" className="space-y-6">
             <div className="bg-white rounded-lg shadow p-6">
               <h2 className="text-2xl font-serif font-bold mb-4">Pending Posts</h2>
               <PendingPosts />
             </div>
-          )}
-        </div>
+
+            <div className="bg-white rounded-lg shadow p-6">
+              <h2 className="text-2xl font-serif font-bold mb-4">Approved Posts</h2>
+              <ManageApprovedPosts />
+            </div>
+          </TabsContent>
+
+          <TabsContent value="announcements">
+            <div className="bg-white rounded-lg shadow p-6">
+              <h2 className="text-2xl font-serif font-bold mb-4">Manage Announcements</h2>
+              <ManageAnnouncements />
+            </div>
+          </TabsContent>
+        </Tabs>
       </main>
     </div>
   );
