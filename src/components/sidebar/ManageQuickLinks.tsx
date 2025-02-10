@@ -108,13 +108,19 @@ export const ManageQuickLinks = () => {
       const newIndex = direction === 'up' ? currentIndex - 1 : currentIndex + 1;
       if (newIndex < 0 || newIndex >= quickLinks.length) return;
 
-      const { error } = await supabase
+      // Update current link's order
+      const { error: error1 } = await supabase
         .from("quick_links")
-        .update([
-          { order_index: quickLinks[newIndex].order_index, id: quickLinks[currentIndex].id },
-          { order_index: quickLinks[currentIndex].order_index, id: quickLinks[newIndex].id }
-        ]);
-      if (error) throw error;
+        .update({ order_index: quickLinks[newIndex].order_index })
+        .eq("id", quickLinks[currentIndex].id);
+      if (error1) throw error1;
+
+      // Update other link's order
+      const { error: error2 } = await supabase
+        .from("quick_links")
+        .update({ order_index: quickLinks[currentIndex].order_index })
+        .eq("id", quickLinks[newIndex].id);
+      if (error2) throw error2;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["quickLinks"] });
