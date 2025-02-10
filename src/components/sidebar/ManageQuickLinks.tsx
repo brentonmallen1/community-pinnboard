@@ -141,6 +141,15 @@ export const ManageQuickLinks = () => {
     setIsEditOpen(true);
   };
 
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (isAddOpen) {
+      createLink.mutate();
+    } else if (isEditOpen) {
+      updateLink.mutate();
+    }
+  };
+
   return (
     <div className="space-y-4">
       <div className="flex justify-between items-center">
@@ -156,24 +165,27 @@ export const ManageQuickLinks = () => {
             <DialogHeader>
               <DialogTitle>Add Quick Link</DialogTitle>
             </DialogHeader>
-            <div className="space-y-4 mt-4">
+            <form onSubmit={handleSubmit} className="space-y-4 mt-4">
               <Input
                 placeholder="Title"
                 value={title}
                 onChange={(e) => setTitle(e.target.value)}
+                required
               />
               <Input
                 placeholder="URL"
                 value={url}
                 onChange={(e) => setUrl(e.target.value)}
+                required
+                type="url"
               />
               <Button 
-                onClick={() => createLink.mutate()}
-                disabled={!title || !url}
+                type="submit"
+                disabled={!title || !url || createLink.isPending}
               >
                 Add Link
               </Button>
-            </div>
+            </form>
           </DialogContent>
         </Dialog>
       </div>
@@ -225,24 +237,27 @@ export const ManageQuickLinks = () => {
           <DialogHeader>
             <DialogTitle>Edit Quick Link</DialogTitle>
           </DialogHeader>
-          <div className="space-y-4 mt-4">
+          <form onSubmit={handleSubmit} className="space-y-4 mt-4">
             <Input
               placeholder="Title"
               value={title}
               onChange={(e) => setTitle(e.target.value)}
+              required
             />
             <Input
               placeholder="URL"
               value={url}
               onChange={(e) => setUrl(e.target.value)}
+              required
+              type="url"
             />
             <Button 
-              onClick={() => updateLink.mutate()}
-              disabled={!title || !url}
+              type="submit"
+              disabled={!title || !url || updateLink.isPending}
             >
               Update Link
             </Button>
-          </div>
+          </form>
         </DialogContent>
       </Dialog>
     </div>
