@@ -1,7 +1,7 @@
 
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/contexts/AuthContext";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { Home } from "lucide-react";
 
 interface MobileMenuProps {
@@ -9,9 +9,15 @@ interface MobileMenuProps {
 }
 
 export const MobileMenu = ({ isOpen }: MobileMenuProps) => {
-  const { user, profile } = useAuth();
+  const { user, profile, signOut } = useAuth();
+  const navigate = useNavigate();
   const isModeratorOrAdmin = profile?.role === "board_member" || profile?.role === "admin";
   const isAdmin = profile?.role === "admin";
+
+  const handleSignOut = async () => {
+    await signOut();
+    navigate("/");
+  };
 
   if (!isOpen) return null;
 
@@ -32,7 +38,7 @@ export const MobileMenu = ({ isOpen }: MobileMenuProps) => {
         </Link>
         
         {user && (
-          <Link to="/dashboard">
+          <Link to="/submit-post">
             <Button variant="ghost" className="w-full text-left justify-start">
               Submit Post
             </Button>
@@ -61,6 +67,16 @@ export const MobileMenu = ({ isOpen }: MobileMenuProps) => {
               Settings
             </Button>
           </Link>
+        )}
+
+        {user && (
+          <Button 
+            variant="ghost" 
+            className="w-full text-left justify-start text-red-600 hover:text-red-700"
+            onClick={handleSignOut}
+          >
+            Sign Out
+          </Button>
         )}
       </div>
     </div>

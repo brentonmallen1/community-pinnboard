@@ -15,7 +15,7 @@ interface HeaderProps {
 }
 
 export const Header = ({ isMobileMenuOpen, setIsMobileMenuOpen, handleAuthClick }: HeaderProps) => {
-  const { user, profile } = useAuth();
+  const { user, profile, signOut } = useAuth();
   const navigate = useNavigate();
   const isModeratorOrAdmin = profile?.role === "board_member" || profile?.role === "admin";
 
@@ -32,6 +32,11 @@ export const Header = ({ isMobileMenuOpen, setIsMobileMenuOpen, handleAuthClick 
     },
     enabled: isModeratorOrAdmin,
   });
+
+  const handleSignOut = async () => {
+    await signOut();
+    navigate("/");
+  };
 
   return (
     <header className="bg-white border-b border-gray-200">
@@ -64,7 +69,7 @@ export const Header = ({ isMobileMenuOpen, setIsMobileMenuOpen, handleAuthClick 
             <Button
               variant="ghost"
               size="icon"
-              onClick={handleAuthClick}
+              onClick={user ? handleSignOut : () => navigate("/auth")}
             >
               {user ? <LogOut className="h-6 w-6" /> : <LogIn className="h-6 w-6" />}
             </Button>
@@ -167,7 +172,7 @@ export const Header = ({ isMobileMenuOpen, setIsMobileMenuOpen, handleAuthClick 
 
             <Button
               variant="ghost"
-              onClick={handleAuthClick}
+              onClick={user ? handleSignOut : () => navigate("/auth")}
               className="ml-4"
             >
               {user ? (

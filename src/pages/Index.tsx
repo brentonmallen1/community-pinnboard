@@ -147,9 +147,9 @@ const Index = () => {
     },
   });
 
-  const handleAuthClick = () => {
+  const handleAuthClick = async () => {
     if (user) {
-      signOut();
+      await signOut();
     } else {
       navigate("/auth");
     }
