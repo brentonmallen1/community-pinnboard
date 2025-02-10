@@ -1,9 +1,11 @@
-
 import { NavigationMenu, NavigationMenuContent, NavigationMenuItem, NavigationMenuLink, NavigationMenuList, NavigationMenuTrigger } from "@/components/ui/navigation-menu";
 import { Button } from "@/components/ui/button";
 import { Menu, LogIn, LogOut, Home } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { Link, useNavigate } from "react-router-dom";
+import { useQuery } from "@tanstack/react-query";
+import { supabase } from "@/integrations/supabase/client";
+import { Badge } from "@/components/ui/badge";
 
 interface HeaderProps {
   isMobileMenuOpen: boolean;
@@ -15,7 +17,20 @@ export const Header = ({ isMobileMenuOpen, setIsMobileMenuOpen, handleAuthClick 
   const { user, profile } = useAuth();
   const navigate = useNavigate();
   const isModeratorOrAdmin = profile?.role === "board_member" || profile?.role === "admin";
-  const isAdmin = profile?.role === "admin";
+
+  const { data: pendingPostsCount } = useQuery({
+    queryKey: ["pendingPostsCount"],
+    queryFn: async () => {
+      const { count, error } = await supabase
+        .from("community_posts")
+        .select("*", { count: 'exact', head: true })
+        .eq("status", "pending");
+
+      if (error) throw error;
+      return count || 0;
+    },
+    enabled: isModeratorOrAdmin,
+  });
 
   return (
     <header className="bg-white border-b border-gray-200">
@@ -67,7 +82,14 @@ export const Header = ({ isMobileMenuOpen, setIsMobileMenuOpen, handleAuthClick 
               <NavigationMenu>
                 <NavigationMenuList className="gap-2">
                   <NavigationMenuItem>
-                    <NavigationMenuTrigger>Posts</NavigationMenuTrigger>
+                    <NavigationMenuTrigger className="relative">
+                      Posts
+                      {isModeratorOrAdmin && pendingPostsCount && pendingPostsCount > 0 && (
+                        <Badge variant="destructive" className="absolute -right-2 -top-2 min-w-[20px] h-5">
+                          {pendingPostsCount}
+                        </Badge>
+                      )}
+                    </NavigationMenuTrigger>
                     <NavigationMenuContent className="min-w-[200px]">
                       <div className="grid gap-1 p-2">
                         <NavigationMenuLink asChild>
@@ -85,7 +107,7 @@ export const Header = ({ isMobileMenuOpen, setIsMobileMenuOpen, handleAuthClick 
                         {isModeratorOrAdmin && (
                           <NavigationMenuLink asChild>
                             <Link to="/dashboard" className="block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground">
-                              Manage Posts
+                              Manage Posts {pendingPostsCount && pendingPostsCount > 0 && `(${pendingPostsCount})`}
                             </Link>
                           </NavigationMenuLink>
                         )}
@@ -129,7 +151,7 @@ export const Header = ({ isMobileMenuOpen, setIsMobileMenuOpen, handleAuthClick 
                     </NavigationMenuContent>
                   </NavigationMenuItem>
 
-                  {isAdmin && (
+                  {profile?.role === "admin" && (
                     <NavigationMenuItem>
                       <NavigationMenuLink asChild>
                         <Link to="/admin/settings" className="block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground">
