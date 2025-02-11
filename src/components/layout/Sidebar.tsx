@@ -19,7 +19,10 @@ export const Sidebar = () => {
         .from("quick_links")
         .select("*")
         .order("order_index", { ascending: true });
-      if (error) throw error;
+      if (error) {
+        console.error("Error fetching quick links:", error);
+        throw error;
+      }
       return data;
     },
   });
@@ -90,7 +93,7 @@ export const Sidebar = () => {
                   key={link.id}
                   variant="ghost"
                   className="w-full justify-start"
-                  onClick={() => window.open(link.url, "_blank")}
+                  onClick={() => window.open(link.url, "_blank", "noopener,noreferrer")}
                 >
                   {link.title}
                 </Button>
