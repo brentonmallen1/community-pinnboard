@@ -30,13 +30,21 @@ export const Sidebar = () => {
   const { data: upcomingEvents } = useQuery({
     queryKey: ["upcomingEvents"],
     queryFn: async () => {
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+
       const { data, error } = await supabase
         .from("upcoming_events")
         .select("*")
         .order("start_date", { ascending: true })
-        .gte("end_date", new Date().toISOString())
+        .gte("end_date", today.toISOString())
         .limit(5);
-      if (error) throw error;
+
+      if (error) {
+        console.error("Error fetching upcoming events:", error);
+        throw error;
+      }
+      console.log("Fetched upcoming events:", data); // Added for debugging
       return data;
     },
   });
@@ -59,7 +67,7 @@ export const Sidebar = () => {
             {upcomingEvents?.length ? (
               <div className="space-y-3">
                 {upcomingEvents.map((event) => (
-                  <div key={event.id}>
+                  <div key={event.id} className="border-b pb-3 last:border-b-0">
                     <h4 className="font-medium">{event.title}</h4>
                     {event.description && (
                       <p className="text-sm text-gray-600 mt-1">{event.description}</p>
