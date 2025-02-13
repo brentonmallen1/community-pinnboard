@@ -47,9 +47,9 @@ export const Sidebar = () => {
       console.log("Fetched upcoming events:", data);
       return data;
     },
-    refetchInterval: 0, // Disable automatic refetching
-    staleTime: 0, // Mark data as stale immediately
-    cacheTime: 0, // Don't cache the data
+    refetchInterval: 0,
+    staleTime: 0,
+    gcTime: 0,
   });
 
   return (
