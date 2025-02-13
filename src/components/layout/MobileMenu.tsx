@@ -54,10 +54,6 @@ export const MobileMenu = ({ isOpen }: MobileMenuProps) => {
         )}
 
         <Button variant="ghost" className="w-full text-left justify-start">
-          Events
-        </Button>
-
-        <Button variant="ghost" className="w-full text-left justify-start">
           Resources
         </Button>
 
