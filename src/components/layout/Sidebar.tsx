@@ -44,9 +44,12 @@ export const Sidebar = () => {
         console.error("Error fetching upcoming events:", error);
         throw error;
       }
-      console.log("Fetched upcoming events:", data); // Added for debugging
+      console.log("Fetched upcoming events:", data);
       return data;
     },
+    refetchInterval: 0, // Disable automatic refetching
+    staleTime: 0, // Mark data as stale immediately
+    cacheTime: 0, // Don't cache the data
   });
 
   return (
