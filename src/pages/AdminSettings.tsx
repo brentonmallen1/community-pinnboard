@@ -1,11 +1,14 @@
+
 import { useState } from "react";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useAuth } from "@/contexts/AuthContext";
 import { Header } from "@/components/layout/Header";
 import { MobileMenu } from "@/components/layout/MobileMenu";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
+import { Switch } from "@/components/ui/switch";
+import { Label } from "@/components/ui/label";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import type { Database } from "@/integrations/supabase/types";
@@ -17,6 +20,8 @@ const AdminSettings = () => {
   const { user, profile, signOut } = useAuth();
   const { toast } = useToast();
   const [communityName, setCommunityName] = useState("");
+  const queryClient = useQueryClient();
+  const [isNarrowLayout, setIsNarrowLayout] = useState(false);
 
   const { data: settings } = useQuery({
     queryKey: ["settings"],
@@ -28,6 +33,7 @@ const AdminSettings = () => {
 
       if (error) throw error;
       setCommunityName(data.community_name);
+      setIsNarrowLayout(data.narrow_layout || false);
       return data;
     },
   });
@@ -47,7 +53,10 @@ const AdminSettings = () => {
   const updateSettings = async () => {
     const { error } = await supabase
       .from("community_settings")
-      .update({ community_name: communityName })
+      .update({ 
+        community_name: communityName,
+        narrow_layout: isNarrowLayout 
+      })
       .eq("id", settings?.id);
 
     if (error) {
@@ -57,10 +66,12 @@ const AdminSettings = () => {
         description: "Please try again later.",
       });
     } else {
+      localStorage.setItem("isNarrowLayout", JSON.stringify(isNarrowLayout));
       toast({
         title: "Settings updated",
         description: "Community settings have been updated successfully.",
       });
+      queryClient.invalidateQueries({ queryKey: ["settings"] });
     }
   };
 
@@ -81,6 +92,7 @@ const AdminSettings = () => {
         title: "Role updated",
         description: "User role has been updated successfully.",
       });
+      queryClient.invalidateQueries({ queryKey: ["users"] });
     }
   };
 
@@ -107,13 +119,21 @@ const AdminSettings = () => {
             <CardContent>
               <div className="space-y-4">
                 <div>
-                  <label className="block text-sm font-medium mb-1">
+                  <label className="block text-sm font-medium mb-1 text-[#222222]">
                     Community Name
                   </label>
                   <Input
                     value={communityName}
                     onChange={(e) => setCommunityName(e.target.value)}
                   />
+                </div>
+                <div className="flex items-center space-x-2">
+                  <Switch
+                    id="narrow-layout"
+                    checked={isNarrowLayout}
+                    onCheckedChange={setIsNarrowLayout}
+                  />
+                  <Label htmlFor="narrow-layout" className="text-[#222222]">Enable Narrow Layout</Label>
                 </div>
                 <Button onClick={updateSettings}>Save Settings</Button>
               </div>
@@ -129,8 +149,8 @@ const AdminSettings = () => {
                 {users?.map((user) => (
                   <div key={user.id} className="flex items-center justify-between p-4 border rounded">
                     <div>
-                      <p className="font-medium">{user.email}</p>
-                      <p className="text-sm text-gray-500">Current role: {user.role}</p>
+                      <p className="font-medium text-[#222222]">{user.email}</p>
+                      <p className="text-sm text-[#222222]">Current role: {user.role}</p>
                     </div>
                     <div className="space-x-2">
                       <Button

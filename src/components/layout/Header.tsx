@@ -1,3 +1,4 @@
+
 import { NavigationMenu, NavigationMenuContent, NavigationMenuItem, NavigationMenuLink, NavigationMenuList, NavigationMenuTrigger } from "@/components/ui/navigation-menu";
 import { Button } from "@/components/ui/button";
 import { Menu, LogIn, LogOut, Home } from "lucide-react";
@@ -14,7 +15,7 @@ interface HeaderProps {
 }
 
 export const Header = ({ isMobileMenuOpen, setIsMobileMenuOpen, handleAuthClick }: HeaderProps) => {
-  const { user, profile, signOut } = useAuth();
+  const { user, profile } = useAuth();
   const navigate = useNavigate();
   const isModeratorOrAdmin = profile?.role === "board_member" || profile?.role === "admin";
 
@@ -32,25 +33,13 @@ export const Header = ({ isMobileMenuOpen, setIsMobileMenuOpen, handleAuthClick 
     enabled: isModeratorOrAdmin,
   });
 
-  const handleSignOut = async () => {
-    await signOut();
-    navigate("/");
-  };
-
-  const resourcesMenuItems = [
-    {
-      label: "Helpful Links",
-      href: "/helpful-links",
-    },
-  ];
-
   return (
     <header className="bg-white border-b border-gray-200">
       <div className="container mx-auto px-4">
         <div className="py-6 text-center">
           <Link to="/" className="hover:opacity-80">
-            <h1 className="text-4xl font-serif font-bold text-gray-900">Community Bulletin Board</h1>
-            <p className="mt-2 text-gray-600">Your Source for Local Updates and Announcements</p>
+            <h1 className="text-4xl font-serif font-bold text-[#222222]">Community Bulletin Board</h1>
+            <p className="mt-2 text-[#222222]">Your Source for Local Updates and Announcements</p>
           </Link>
         </div>
         
@@ -72,13 +61,23 @@ export const Header = ({ isMobileMenuOpen, setIsMobileMenuOpen, handleAuthClick 
                 <Home className="h-6 w-6" />
               </Button>
             </div>
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={user ? handleSignOut : () => navigate("/auth")}
-            >
-              {user ? <LogOut className="h-6 w-6" /> : <LogIn className="h-6 w-6" />}
-            </Button>
+            {user ? (
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={handleAuthClick}
+              >
+                <LogOut className="h-6 w-6" />
+              </Button>
+            ) : (
+              <Button
+                variant="ghost"
+                onClick={() => navigate("/auth")}
+              >
+                <LogIn className="h-4 w-4 mr-2" />
+                Sign In
+              </Button>
+            )}
           </div>
           
           <div className="hidden md:flex justify-between items-center">
@@ -131,13 +130,11 @@ export const Header = ({ isMobileMenuOpen, setIsMobileMenuOpen, handleAuthClick 
                     <NavigationMenuTrigger>Resources</NavigationMenuTrigger>
                     <NavigationMenuContent className="min-w-[200px]">
                       <div className="grid gap-1 p-2">
-                        {resourcesMenuItems.map((item, index) => (
-                          <NavigationMenuLink asChild key={index}>
-                            <Link to={item.href} className="block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground">
-                              {item.label}
-                            </Link>
-                          </NavigationMenuLink>
-                        ))}
+                        <NavigationMenuLink asChild>
+                          <Link to="/helpful-links" className="block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground">
+                            Helpful Links
+                          </Link>
+                        </NavigationMenuLink>
                       </div>
                     </NavigationMenuContent>
                   </NavigationMenuItem>
@@ -155,23 +152,24 @@ export const Header = ({ isMobileMenuOpen, setIsMobileMenuOpen, handleAuthClick 
               </NavigationMenu>
             </div>
 
-            <Button
-              variant="ghost"
-              onClick={user ? handleSignOut : () => navigate("/auth")}
-              className="ml-4"
-            >
-              {user ? (
-                <>
-                  <LogOut className="h-4 w-4 mr-2" />
-                  Sign Out
-                </>
-              ) : (
-                <>
-                  <LogIn className="h-4 w-4 mr-2" />
-                  Sign In
-                </>
-              )}
-            </Button>
+            {user ? (
+              <Button
+                variant="ghost"
+                onClick={handleAuthClick}
+                className="ml-4"
+              >
+                <LogOut className="h-4 w-4" />
+              </Button>
+            ) : (
+              <Button
+                variant="ghost"
+                onClick={() => navigate("/auth")}
+                className="ml-4"
+              >
+                <LogIn className="h-4 w-4 mr-2" />
+                Sign In
+              </Button>
+            )}
           </div>
         </nav>
       </div>

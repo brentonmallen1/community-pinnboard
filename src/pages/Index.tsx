@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 import { useNavigate } from "react-router-dom";
@@ -11,23 +10,30 @@ import { useToast } from "@/hooks/use-toast";
 import { AnnouncementsList } from "@/components/announcements/AnnouncementsList";
 import { CreateAnnouncementDialog } from "@/components/announcements/CreateAnnouncementDialog";
 import { PostsList } from "@/components/posts/PostsList";
-import { Switch } from "@/components/ui/switch";
-import { Label } from "@/components/ui/label";
 
 const Index = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isAddAnnouncementOpen, setIsAddAnnouncementOpen] = useState(false);
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
-  const [isNarrow, setIsNarrow] = useState(() => {
-    const stored = localStorage.getItem("isNarrowLayout");
-    return stored ? JSON.parse(stored) : false;
-  });
   const { user, profile, signOut } = useAuth();
   const navigate = useNavigate();
   const { toast } = useToast();
   const queryClient = useQueryClient();
   const isModeratorOrAdmin = profile?.role === "board_member" || profile?.role === "admin";
+
+  const { data: settings } = useQuery({
+    queryKey: ["settings"],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("community_settings")
+        .select("*")
+        .single();
+
+      if (error) throw error;
+      return data;
+    },
+  });
 
   const { data: posts, isLoading: isLoadingPosts } = useQuery({
     queryKey: ["approved-posts"],
@@ -119,10 +125,7 @@ const Index = () => {
     },
   });
 
-  const handleNarrowToggle = (checked: boolean) => {
-    setIsNarrow(checked);
-    localStorage.setItem("isNarrowLayout", JSON.stringify(checked));
-  };
+  const isNarrow = settings?.narrow_layout || false;
 
   return (
     <div className={`min-h-screen ${isNarrow ? 'bg-[#222222]' : 'bg-[#f3f3f3]'}`}>
@@ -136,18 +139,7 @@ const Index = () => {
       <main className="min-h-[calc(100vh-4rem)] mx-auto flex flex-col">
         <div className={`flex-1 ${isNarrow ? 'max-w-5xl mx-auto bg-[#f3f3f3]' : 'container'}`}>
           <div className={`h-full ${isNarrow ? 'px-4' : ''}`}>
-            <div className="flex justify-end my-4">
-              <div className="flex items-center space-x-2">
-                <Switch
-                  id="narrow-mode"
-                  checked={isNarrow}
-                  onCheckedChange={handleNarrowToggle}
-                />
-                <Label htmlFor="narrow-mode" className="text-[#222222]">Narrow Layout</Label>
-              </div>
-            </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-12 gap-8">
+            <div className="grid grid-cols-1 md:grid-cols-12 gap-8 py-8">
               <div className="md:col-span-8">
                 <div className="space-y-6">
                   {/* Announcements Section */}
