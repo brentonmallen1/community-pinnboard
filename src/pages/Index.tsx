@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 import { useNavigate } from "react-router-dom";
@@ -72,8 +73,8 @@ const Index = () => {
       const { data, error } = await supabase
         .from("events")
         .select("*")
-        .gte("start_date", today.toISOString())
-        .order("start_date", { ascending: true })
+        .gte("start_time", today.toISOString())
+        .order("start_time", { ascending: true })
         .limit(3);
 
       if (error) throw error;
@@ -87,8 +88,8 @@ const Index = () => {
       const { data, error } = await supabase
         .from("events")
         .select("*")
-        .lt("end_date", today.toISOString())
-        .order("end_date", { ascending: false })
+        .lt("end_time", today.toISOString())
+        .order("end_time", { ascending: false })
         .limit(2);
 
       if (error) throw error;
@@ -363,10 +364,10 @@ const Index = () => {
                               <p className="text-gray-600 mb-3">{event.description}</p>
                             )}
                             <p className="text-sm text-gray-500">
-                              Starts: {formatEventDate(event.start_date)}
+                              Starts: {formatEventDate(event.start_time)}
                             </p>
                             <p className="text-sm text-gray-500">
-                              Ends: {formatEventDate(event.end_date)}
+                              Ends: {formatEventDate(event.end_time)}
                             </p>
                           </CardContent>
                         </Card>
@@ -401,7 +402,7 @@ const Index = () => {
                               <p className="text-gray-600 mb-3">{event.description}</p>
                             )}
                             <p className="text-sm text-gray-500">
-                              Was held from {formatEventDate(event.start_date)} to {formatEventDate(event.end_date)}
+                              Was held from {formatEventDate(event.start_time)} to {formatEventDate(event.end_time)}
                             </p>
                           </CardContent>
                         </Card>
