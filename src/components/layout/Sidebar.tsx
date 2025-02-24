@@ -16,8 +16,9 @@ export const Sidebar = () => {
     queryKey: ["quickLinks"],
     queryFn: async () => {
       const { data, error } = await supabase
-        .from("quick_links")
+        .from("links")
         .select("*")
+        .eq("is_quick_link", true)
         .order("order_index", { ascending: true });
       if (error) {
         console.error("Error fetching quick links:", error);
@@ -44,12 +45,8 @@ export const Sidebar = () => {
         console.error("Error fetching upcoming events:", error);
         throw error;
       }
-      console.log("Fetched upcoming events:", data);
       return data;
     },
-    refetchInterval: 0,
-    staleTime: 0,
-    gcTime: 0,
   });
 
   return (
@@ -109,6 +106,13 @@ export const Sidebar = () => {
                   {link.title}
                 </Button>
               ))}
+              <Button
+                variant="ghost"
+                className="w-full justify-start"
+                onClick={() => navigate("/helpful-links")}
+              >
+                View All Links
+              </Button>
             </div>
           </div>
         </>

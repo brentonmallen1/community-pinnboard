@@ -215,37 +215,43 @@ export type Database = {
           },
         ]
       }
-      helpful_links: {
+      links: {
         Row: {
-          author_id: string
+          author_id: string | null
           created_at: string
           description: string | null
           id: string
+          is_quick_link: boolean | null
+          order_index: number | null
           title: string
           updated_at: string
           url: string
         }
         Insert: {
-          author_id: string
+          author_id?: string | null
           created_at?: string
           description?: string | null
           id?: string
+          is_quick_link?: boolean | null
+          order_index?: number | null
           title: string
           updated_at?: string
           url: string
         }
         Update: {
-          author_id?: string
+          author_id?: string | null
           created_at?: string
           description?: string | null
           id?: string
+          is_quick_link?: boolean | null
+          order_index?: number | null
           title?: string
           updated_at?: string
           url?: string
         }
         Relationships: [
           {
-            foreignKeyName: "helpful_links_author_id_fkey"
+            foreignKeyName: "links_author_id_fkey"
             columns: ["author_id"]
             isOneToOne: false
             referencedRelation: "profiles"
@@ -274,33 +280,6 @@ export type Database = {
           id?: string
           role?: Database["public"]["Enums"]["user_role"] | null
           updated_at?: string
-        }
-        Relationships: []
-      }
-      quick_links: {
-        Row: {
-          created_at: string
-          id: string
-          order_index: number
-          title: string
-          updated_at: string
-          url: string
-        }
-        Insert: {
-          created_at?: string
-          id?: string
-          order_index?: number
-          title: string
-          updated_at?: string
-          url: string
-        }
-        Update: {
-          created_at?: string
-          id?: string
-          order_index?: number
-          title?: string
-          updated_at?: string
-          url?: string
         }
         Relationships: []
       }

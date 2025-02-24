@@ -21,8 +21,9 @@ export const ManageQuickLinks = () => {
     queryKey: ["quickLinks"],
     queryFn: async () => {
       const { data, error } = await supabase
-        .from("quick_links")
+        .from("links")
         .select("*")
+        .eq("is_quick_link", true)
         .order("order_index", { ascending: true });
       if (error) throw error;
       return data;
@@ -33,8 +34,14 @@ export const ManageQuickLinks = () => {
     mutationFn: async () => {
       const maxOrder = quickLinks?.reduce((max, link) => Math.max(max, link.order_index), -1) ?? -1;
       const { error } = await supabase
-        .from("quick_links")
-        .insert([{ title, url, order_index: maxOrder + 1 }]);
+        .from("links")
+        .insert([{ 
+          title, 
+          url, 
+          is_quick_link: true, 
+          order_index: maxOrder + 1,
+          author_id: (await supabase.auth.getUser()).data.user?.id
+        }]);
       if (error) throw error;
     },
     onSuccess: () => {
@@ -56,7 +63,7 @@ export const ManageQuickLinks = () => {
   const updateLink = useMutation({
     mutationFn: async () => {
       const { error } = await supabase
-        .from("quick_links")
+        .from("links")
         .update({ title, url })
         .eq("id", selectedLink.id);
       if (error) throw error;
@@ -81,7 +88,7 @@ export const ManageQuickLinks = () => {
   const deleteLink = useMutation({
     mutationFn: async (id: string) => {
       const { error } = await supabase
-        .from("quick_links")
+        .from("links")
         .delete()
         .eq("id", id);
       if (error) throw error;
@@ -110,14 +117,14 @@ export const ManageQuickLinks = () => {
 
       // Update current link's order
       const { error: error1 } = await supabase
-        .from("quick_links")
+        .from("links")
         .update({ order_index: quickLinks[newIndex].order_index })
         .eq("id", quickLinks[currentIndex].id);
       if (error1) throw error1;
 
       // Update other link's order
       const { error: error2 } = await supabase
-        .from("quick_links")
+        .from("links")
         .update({ order_index: quickLinks[currentIndex].order_index })
         .eq("id", quickLinks[newIndex].id);
       if (error2) throw error2;
@@ -141,15 +148,6 @@ export const ManageQuickLinks = () => {
     setIsEditOpen(true);
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (isAddOpen) {
-      createLink.mutate();
-    } else if (isEditOpen) {
-      updateLink.mutate();
-    }
-  };
-
   return (
     <div className="space-y-4">
       <div className="flex justify-between items-center">
@@ -165,7 +163,7 @@ export const ManageQuickLinks = () => {
             <DialogHeader>
               <DialogTitle>Add Quick Link</DialogTitle>
             </DialogHeader>
-            <form onSubmit={handleSubmit} className="space-y-4 mt-4">
+            <form onSubmit={(e) => { e.preventDefault(); createLink.mutate(); }} className="space-y-4 mt-4">
               <Input
                 placeholder="Title"
                 value={title}
@@ -237,7 +235,7 @@ export const ManageQuickLinks = () => {
           <DialogHeader>
             <DialogTitle>Edit Quick Link</DialogTitle>
           </DialogHeader>
-          <form onSubmit={handleSubmit} className="space-y-4 mt-4">
+          <form onSubmit={(e) => { e.preventDefault(); updateLink.mutate(); }} className="space-y-4 mt-4">
             <Input
               placeholder="Title"
               value={title}
