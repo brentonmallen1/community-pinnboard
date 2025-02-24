@@ -125,7 +125,7 @@ const Index = () => {
   };
 
   return (
-    <div className={`min-h-screen ${isNarrow ? 'bg-[#000000]' : 'bg-[#f3f3f3]'}`}>
+    <div className={`min-h-screen ${isNarrow ? 'bg-[#222222]' : 'bg-[#f3f3f3]'}`}>
       <Header 
         isMobileMenuOpen={isMobileMenuOpen}
         setIsMobileMenuOpen={setIsMobileMenuOpen}
@@ -133,8 +133,8 @@ const Index = () => {
       />
       <MobileMenu isOpen={isMobileMenuOpen} />
 
-      <main className={`mx-auto py-8 ${isNarrow ? 'px-0' : 'px-4'}`}>
-        <div className={`${isNarrow ? 'max-w-5xl mx-auto bg-[#f3f3f3] px-4' : 'container'}`}>
+      <main className={`min-h-[calc(100vh-4rem)] mx-auto ${isNarrow ? 'px-0' : 'px-4'} py-0`}>
+        <div className={`${isNarrow ? 'max-w-5xl mx-auto bg-[#f3f3f3] px-4 min-h-full py-8' : 'container py-8'}`}>
           <div className="flex justify-end mb-4">
             <div className="flex items-center space-x-2">
               <Switch
