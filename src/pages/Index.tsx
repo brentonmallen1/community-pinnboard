@@ -125,7 +125,7 @@ const Index = () => {
   };
 
   return (
-    <div className="min-h-screen bg-[#f3f3f3]">
+    <div className={`min-h-screen ${isNarrow ? 'bg-[#000000]' : 'bg-[#f3f3f3]'}`}>
       <Header 
         isMobileMenuOpen={isMobileMenuOpen}
         setIsMobileMenuOpen={setIsMobileMenuOpen}
@@ -133,50 +133,52 @@ const Index = () => {
       />
       <MobileMenu isOpen={isMobileMenuOpen} />
 
-      <main className={`mx-auto px-4 py-8 ${isNarrow ? 'max-w-5xl border-x border-[#000000]' : 'container'}`}>
-        <div className="flex justify-end mb-4">
-          <div className="flex items-center space-x-2">
-            <Switch
-              id="narrow-mode"
-              checked={isNarrow}
-              onCheckedChange={handleNarrowToggle}
-            />
-            <Label htmlFor="narrow-mode">Narrow Layout</Label>
-          </div>
-        </div>
-
-        <div className="grid grid-cols-1 md:grid-cols-12 gap-8">
-          <div className="md:col-span-8">
-            <div className="space-y-6">
-              {/* Announcements Section */}
-              <div>
-                <div className="flex justify-between items-center mb-4">
-                  <h2 className="text-2xl font-serif font-bold">Announcements</h2>
-                  {isModeratorOrAdmin && (
-                    <CreateAnnouncementDialog
-                      isOpen={isAddAnnouncementOpen}
-                      onOpenChange={setIsAddAnnouncementOpen}
-                      title={title}
-                      content={content}
-                      onTitleChange={setTitle}
-                      onContentChange={setContent}
-                      onSubmit={() => createAnnouncement.mutate()}
-                    />
-                  )}
-                </div>
-                <AnnouncementsList
-                  announcements={announcements}
-                  isLoading={isLoadingAnnouncements}
-                  onEdit={() => {}}
-                  onDelete={(id) => deleteAnnouncement.mutate(id)}
-                />
-              </div>
-
-              {/* Posts Section */}
-              <PostsList posts={posts} isLoading={isLoadingPosts} />
+      <main className={`mx-auto py-8 ${isNarrow ? 'px-0' : 'px-4'}`}>
+        <div className={`${isNarrow ? 'max-w-5xl mx-auto bg-[#f3f3f3] px-4' : 'container'}`}>
+          <div className="flex justify-end mb-4">
+            <div className="flex items-center space-x-2">
+              <Switch
+                id="narrow-mode"
+                checked={isNarrow}
+                onCheckedChange={handleNarrowToggle}
+              />
+              <Label htmlFor="narrow-mode">Narrow Layout</Label>
             </div>
           </div>
-          <Sidebar />
+
+          <div className="grid grid-cols-1 md:grid-cols-12 gap-8">
+            <div className="md:col-span-8">
+              <div className="space-y-6">
+                {/* Announcements Section */}
+                <div>
+                  <div className="flex justify-between items-center mb-4">
+                    <h2 className="text-2xl font-serif font-bold">Announcements</h2>
+                    {isModeratorOrAdmin && (
+                      <CreateAnnouncementDialog
+                        isOpen={isAddAnnouncementOpen}
+                        onOpenChange={setIsAddAnnouncementOpen}
+                        title={title}
+                        content={content}
+                        onTitleChange={setTitle}
+                        onContentChange={setContent}
+                        onSubmit={() => createAnnouncement.mutate()}
+                      />
+                    )}
+                  </div>
+                  <AnnouncementsList
+                    announcements={announcements}
+                    isLoading={isLoadingAnnouncements}
+                    onEdit={() => {}}
+                    onDelete={(id) => deleteAnnouncement.mutate(id)}
+                  />
+                </div>
+
+                {/* Posts Section */}
+                <PostsList posts={posts} isLoading={isLoadingPosts} />
+              </div>
+            </div>
+            <Sidebar />
+          </div>
         </div>
       </main>
     </div>
