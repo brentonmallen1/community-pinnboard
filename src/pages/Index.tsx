@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 import { useNavigate } from "react-router-dom";
@@ -132,7 +133,7 @@ const Index = () => {
       />
       <MobileMenu isOpen={isMobileMenuOpen} />
 
-      <main className={`mx-auto px-4 py-8 ${isNarrow ? 'max-w-5xl border-x border-gray-200' : 'container'}`}>
+      <main className={`mx-auto px-4 py-8 ${isNarrow ? 'max-w-5xl border-x border-[#000000]' : 'container'}`}>
         <div className="flex justify-end mb-4">
           <div className="flex items-center space-x-2">
             <Switch
