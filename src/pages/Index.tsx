@@ -133,51 +133,53 @@ const Index = () => {
       />
       <MobileMenu isOpen={isMobileMenuOpen} />
 
-      <main className={`min-h-[calc(100vh-4rem)] mx-auto ${isNarrow ? 'px-0' : 'px-4'} py-0`}>
-        <div className={`${isNarrow ? 'max-w-5xl mx-auto bg-[#f3f3f3] px-4 min-h-full py-8' : 'container py-8'}`}>
-          <div className="flex justify-end mb-4">
-            <div className="flex items-center space-x-2">
-              <Switch
-                id="narrow-mode"
-                checked={isNarrow}
-                onCheckedChange={handleNarrowToggle}
-              />
-              <Label htmlFor="narrow-mode" className="text-[#222222]">Narrow Layout</Label>
-            </div>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-12 gap-8">
-            <div className="md:col-span-8">
-              <div className="space-y-6">
-                {/* Announcements Section */}
-                <div>
-                  <div className="flex justify-between items-center mb-4">
-                    <h2 className="text-2xl font-serif font-bold text-[#222222]">Announcements</h2>
-                    {isModeratorOrAdmin && (
-                      <CreateAnnouncementDialog
-                        isOpen={isAddAnnouncementOpen}
-                        onOpenChange={setIsAddAnnouncementOpen}
-                        title={title}
-                        content={content}
-                        onTitleChange={setTitle}
-                        onContentChange={setContent}
-                        onSubmit={() => createAnnouncement.mutate()}
-                      />
-                    )}
-                  </div>
-                  <AnnouncementsList
-                    announcements={announcements}
-                    isLoading={isLoadingAnnouncements}
-                    onEdit={() => {}}
-                    onDelete={(id) => deleteAnnouncement.mutate(id)}
-                  />
-                </div>
-
-                {/* Posts Section */}
-                <PostsList posts={posts} isLoading={isLoadingPosts} />
+      <main className="min-h-[calc(100vh-4rem)] mx-auto flex flex-col">
+        <div className={`flex-1 ${isNarrow ? 'max-w-5xl mx-auto bg-[#f3f3f3]' : 'container'}`}>
+          <div className={`h-full ${isNarrow ? 'px-4' : ''}`}>
+            <div className="flex justify-end my-4">
+              <div className="flex items-center space-x-2">
+                <Switch
+                  id="narrow-mode"
+                  checked={isNarrow}
+                  onCheckedChange={handleNarrowToggle}
+                />
+                <Label htmlFor="narrow-mode" className="text-[#222222]">Narrow Layout</Label>
               </div>
             </div>
-            <Sidebar />
+
+            <div className="grid grid-cols-1 md:grid-cols-12 gap-8">
+              <div className="md:col-span-8">
+                <div className="space-y-6">
+                  {/* Announcements Section */}
+                  <div>
+                    <div className="flex justify-between items-center mb-4">
+                      <h2 className="text-2xl font-serif font-bold text-[#222222]">Announcements</h2>
+                      {isModeratorOrAdmin && (
+                        <CreateAnnouncementDialog
+                          isOpen={isAddAnnouncementOpen}
+                          onOpenChange={setIsAddAnnouncementOpen}
+                          title={title}
+                          content={content}
+                          onTitleChange={setTitle}
+                          onContentChange={setContent}
+                          onSubmit={() => createAnnouncement.mutate()}
+                        />
+                      )}
+                    </div>
+                    <AnnouncementsList
+                      announcements={announcements}
+                      isLoading={isLoadingAnnouncements}
+                      onEdit={() => {}}
+                      onDelete={(id) => deleteAnnouncement.mutate(id)}
+                    />
+                  </div>
+
+                  {/* Posts Section */}
+                  <PostsList posts={posts} isLoading={isLoadingPosts} />
+                </div>
+              </div>
+              <Sidebar />
+            </div>
           </div>
         </div>
       </main>
