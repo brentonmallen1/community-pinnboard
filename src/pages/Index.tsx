@@ -142,7 +142,7 @@ const Index = () => {
                 checked={isNarrow}
                 onCheckedChange={handleNarrowToggle}
               />
-              <Label htmlFor="narrow-mode">Narrow Layout</Label>
+              <Label htmlFor="narrow-mode" className="text-[#222222]">Narrow Layout</Label>
             </div>
           </div>
 
@@ -152,7 +152,7 @@ const Index = () => {
                 {/* Announcements Section */}
                 <div>
                   <div className="flex justify-between items-center mb-4">
-                    <h2 className="text-2xl font-serif font-bold">Announcements</h2>
+                    <h2 className="text-2xl font-serif font-bold text-[#222222]">Announcements</h2>
                     {isModeratorOrAdmin && (
                       <CreateAnnouncementDialog
                         isOpen={isAddAnnouncementOpen}

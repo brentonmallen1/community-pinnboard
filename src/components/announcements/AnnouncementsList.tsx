@@ -35,7 +35,7 @@ export const AnnouncementsList = ({
     return (
       <div className="text-center py-8">
         <div className="animate-spin h-8 w-8 border-4 border-blue-500 border-t-transparent rounded-full mx-auto mb-4"></div>
-        Loading announcements...
+        <span className="text-[#222222]">Loading announcements...</span>
       </div>
     );
   }
@@ -43,7 +43,7 @@ export const AnnouncementsList = ({
   if (!announcements || announcements.length === 0) {
     return (
       <Card>
-        <CardContent className="p-6 text-center text-gray-500">
+        <CardContent className="p-6 text-center text-[#222222]">
           No announcements available at this time.
         </CardContent>
       </Card>
@@ -55,13 +55,13 @@ export const AnnouncementsList = ({
       {announcements.map((announcement) => (
         <Card key={announcement.id}>
           <CardHeader>
-            <CardTitle>{announcement.title}</CardTitle>
-            <p className="text-sm text-gray-500">
+            <CardTitle className="text-[#222222]">{announcement.title}</CardTitle>
+            <p className="text-sm text-[#222222]">
               {new Date(announcement.created_at).toLocaleDateString()}
             </p>
           </CardHeader>
           <CardContent>
-            <p>{announcement.content}</p>
+            <p className="text-[#222222]">{announcement.content}</p>
           </CardContent>
           {isModeratorOrAdmin && announcement.author_id === user?.id && (
             <CardFooter className="justify-end space-x-2">
