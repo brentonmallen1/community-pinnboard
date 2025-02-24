@@ -26,7 +26,6 @@ const Index = () => {
   const { toast } = useToast();
   const queryClient = useQueryClient();
   const isModeratorOrAdmin = profile?.role === "board_member" || profile?.role === "admin";
-  const today = new Date();
 
   const { data: posts, isLoading: isLoadingPosts } = useQuery({
     queryKey: ["approved-posts"],
@@ -60,36 +59,6 @@ const Index = () => {
           )
         `)
         .order("created_at", { ascending: false });
-
-      if (error) throw error;
-      return data;
-    },
-  });
-
-  const { data: upcomingEvents, isLoading: isLoadingUpcomingEvents } = useQuery({
-    queryKey: ["upcoming-events"],
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from("events")
-        .select("*")
-        .gte("start_time", today.toISOString())
-        .order("start_time", { ascending: true })
-        .limit(3);
-
-      if (error) throw error;
-      return data;
-    },
-  });
-
-  const { data: pastEvents, isLoading: isLoadingPastEvents } = useQuery({
-    queryKey: ["past-events"],
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from("events")
-        .select("*")
-        .lt("end_time", today.toISOString())
-        .order("end_time", { ascending: false })
-        .limit(2);
 
       if (error) throw error;
       return data;
@@ -303,150 +272,46 @@ const Index = () => {
                     ))}
                   </div>
                 )}
-
-                {/* Edit Announcement Dialog */}
-                <Dialog open={isEditAnnouncementOpen} onOpenChange={setIsEditAnnouncementOpen}>
-                  <DialogContent>
-                    <DialogHeader>
-                      <DialogTitle>Edit Announcement</DialogTitle>
-                    </DialogHeader>
-                    <div className="space-y-4 mt-4">
-                      <Input
-                        placeholder="Title"
-                        value={title}
-                        onChange={(e) => setTitle(e.target.value)}
-                      />
-                      <Textarea
-                        placeholder="Content"
-                        value={content}
-                        onChange={(e) => setContent(e.target.value)}
-                        className="min-h-[100px]"
-                      />
-                      <Button 
-                        onClick={() => updateAnnouncement.mutate()}
-                        disabled={!title || !content}
-                      >
-                        Update Announcement
-                      </Button>
-                    </div>
-                  </DialogContent>
-                </Dialog>
-              </div>
-
-              {/* Events Section */}
-              <div>
-                <h2 className="text-2xl font-serif font-bold mb-6">Events</h2>
-                
-                {/* Upcoming Events */}
-                <div className="mb-8">
-                  <h3 className="text-xl font-semibold mb-4">Upcoming Events</h3>
-                  {isLoadingUpcomingEvents ? (
-                    <div className="text-center py-4">
-                      <div className="animate-spin h-8 w-8 border-4 border-blue-500 border-t-transparent rounded-full mx-auto mb-4"></div>
-                      Loading upcoming events...
-                    </div>
-                  ) : !upcomingEvents || upcomingEvents.length === 0 ? (
-                    <Card>
-                      <CardContent className="p-6 text-center text-gray-500">
-                        No upcoming events scheduled.
-                      </CardContent>
-                    </Card>
-                  ) : (
-                    <div className="space-y-4">
-                      {upcomingEvents.map((event) => (
-                        <Card key={event.id}>
-                          <CardHeader>
-                            <CardTitle>{event.title}</CardTitle>
-                          </CardHeader>
-                          <CardContent>
-                            {event.description && (
-                              <p className="text-gray-600 mb-3">{event.description}</p>
-                            )}
-                            <p className="text-sm text-gray-500">
-                              Starts: {formatEventDate(event.start_time)}
-                            </p>
-                            <p className="text-sm text-gray-500">
-                              Ends: {formatEventDate(event.end_time)}
-                            </p>
-                          </CardContent>
-                        </Card>
-                      ))}
-                    </div>
-                  )}
-                </div>
-
-                {/* Past Events */}
-                <div>
-                  <h3 className="text-xl font-semibold mb-4">Recent Past Events</h3>
-                  {isLoadingPastEvents ? (
-                    <div className="text-center py-4">
-                      <div className="animate-spin h-8 w-8 border-4 border-blue-500 border-t-transparent rounded-full mx-auto mb-4"></div>
-                      Loading past events...
-                    </div>
-                  ) : !pastEvents || pastEvents.length === 0 ? (
-                    <Card>
-                      <CardContent className="p-6 text-center text-gray-500">
-                        No past events to show.
-                      </CardContent>
-                    </Card>
-                  ) : (
-                    <div className="space-y-4">
-                      {pastEvents.map((event) => (
-                        <Card key={event.id} className="bg-gray-50">
-                          <CardHeader>
-                            <CardTitle>{event.title}</CardTitle>
-                          </CardHeader>
-                          <CardContent>
-                            {event.description && (
-                              <p className="text-gray-600 mb-3">{event.description}</p>
-                            )}
-                            <p className="text-sm text-gray-500">
-                              Was held from {formatEventDate(event.start_time)} to {formatEventDate(event.end_time)}
-                            </p>
-                          </CardContent>
-                        </Card>
-                      ))}
-                    </div>
-                  )}
-                </div>
               </div>
 
               {/* Posts Section */}
-              <div className="flex justify-between items-center">
-                <h2 className="text-2xl font-serif font-bold">Latest Posts</h2>
-                {posts && posts.length > 0 && (
-                  <Button variant="ghost" onClick={() => navigate("/posts")}>
-                    View All Posts
-                  </Button>
-                )}
-              </div>
-
-              {isLoadingPosts ? (
-                <div className="text-center py-8">
-                  <div className="animate-spin h-8 w-8 border-4 border-blue-500 border-t-transparent rounded-full mx-auto mb-4"></div>
-                  Loading posts...
+              <div>
+                <div className="flex justify-between items-center">
+                  <h2 className="text-2xl font-serif font-bold">Latest Posts</h2>
+                  {posts && posts.length > 0 && (
+                    <Button variant="ghost" onClick={() => navigate("/posts")}>
+                      View All Posts
+                    </Button>
+                  )}
                 </div>
-              ) : !posts || posts.length === 0 ? (
-                <Card>
-                  <CardContent className="p-6 text-center text-gray-500">
-                    No posts available at this time.
-                  </CardContent>
-                </Card>
-              ) : (
-                posts.map((post) => (
-                  <Card key={post.id}>
-                    <CardHeader>
-                      <CardTitle>{post.title}</CardTitle>
-                      <p className="text-sm text-gray-500">
-                        By {post.profiles.email} • {new Date(post.created_at).toLocaleDateString()}
-                      </p>
-                    </CardHeader>
-                    <CardContent>
-                      <p>{post.content}</p>
+
+                {isLoadingPosts ? (
+                  <div className="text-center py-8">
+                    <div className="animate-spin h-8 w-8 border-4 border-blue-500 border-t-transparent rounded-full mx-auto mb-4"></div>
+                    Loading posts...
+                  </div>
+                ) : !posts || posts.length === 0 ? (
+                  <Card>
+                    <CardContent className="p-6 text-center text-gray-500">
+                      No posts available at this time.
                     </CardContent>
                   </Card>
-                ))
-              )}
+                ) : (
+                  posts.map((post) => (
+                    <Card key={post.id}>
+                      <CardHeader>
+                        <CardTitle>{post.title}</CardTitle>
+                        <p className="text-sm text-gray-500">
+                          By {post.profiles.email} • {new Date(post.created_at).toLocaleDateString()}
+                        </p>
+                      </CardHeader>
+                      <CardContent>
+                        <p>{post.content}</p>
+                      </CardContent>
+                    </Card>
+                  ))
+                )}
+              </div>
             </div>
           </div>
           <Sidebar />
