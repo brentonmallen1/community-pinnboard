@@ -35,10 +35,10 @@ export const Sidebar = () => {
       today.setHours(0, 0, 0, 0);
 
       const { data, error } = await supabase
-        .from("upcoming_events")
+        .from("events")
         .select("*")
-        .order("start_date", { ascending: true })
-        .gte("end_date", today.toISOString())
+        .order("start_time", { ascending: true })
+        .gte("end_time", today.toISOString())
         .limit(5);
 
       if (error) {
@@ -73,8 +73,8 @@ export const Sidebar = () => {
                       <p className="text-sm text-gray-600 mt-1">{event.description}</p>
                     )}
                     <p className="text-sm text-gray-500 mt-1">
-                      {new Date(event.start_date).toLocaleDateString()} -{" "}
-                      {new Date(event.end_date).toLocaleDateString()}
+                      {new Date(event.start_time).toLocaleDateString()} -{" "}
+                      {new Date(event.end_time).toLocaleDateString()}
                     </p>
                   </div>
                 ))}
