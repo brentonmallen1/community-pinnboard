@@ -3,7 +3,6 @@ import { Card, CardContent, CardHeader, CardTitle, CardFooter } from "@/componen
 import { Button } from "@/components/ui/button";
 import { Edit, Trash } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
-import { User } from "@supabase/supabase-js";
 
 interface Announcement {
   id: string;
@@ -58,7 +57,7 @@ export const AnnouncementsList = ({
           <CardHeader>
             <CardTitle>{announcement.title}</CardTitle>
             <p className="text-sm text-gray-500">
-              By {announcement.profiles.email} • {new Date(announcement.created_at).toLocaleDateString()}
+              {new Date(announcement.created_at).toLocaleDateString()}
             </p>
           </CardHeader>
           <CardContent>

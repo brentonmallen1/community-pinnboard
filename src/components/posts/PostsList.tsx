@@ -53,7 +53,7 @@ export const PostsList = ({ posts, isLoading }: PostsListProps) => {
           <CardHeader>
             <CardTitle>{post.title}</CardTitle>
             <p className="text-sm text-gray-500">
-              By {post.profiles.email} • {new Date(post.created_at).toLocaleDateString()}
+              {new Date(post.created_at).toLocaleDateString()}
             </p>
           </CardHeader>
           <CardContent>

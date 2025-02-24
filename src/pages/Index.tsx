@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 import { useNavigate } from "react-router-dom";
@@ -11,12 +10,18 @@ import { useToast } from "@/hooks/use-toast";
 import { AnnouncementsList } from "@/components/announcements/AnnouncementsList";
 import { CreateAnnouncementDialog } from "@/components/announcements/CreateAnnouncementDialog";
 import { PostsList } from "@/components/posts/PostsList";
+import { Switch } from "@/components/ui/switch";
+import { Label } from "@/components/ui/label";
 
 const Index = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isAddAnnouncementOpen, setIsAddAnnouncementOpen] = useState(false);
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
+  const [isNarrow, setIsNarrow] = useState(() => {
+    const stored = localStorage.getItem("isNarrowLayout");
+    return stored ? JSON.parse(stored) : false;
+  });
   const { user, profile, signOut } = useAuth();
   const navigate = useNavigate();
   const { toast } = useToast();
@@ -113,12 +118,9 @@ const Index = () => {
     },
   });
 
-  const handleAuthClick = async () => {
-    if (user) {
-      await signOut();
-    } else {
-      navigate("/auth");
-    }
+  const handleNarrowToggle = (checked: boolean) => {
+    setIsNarrow(checked);
+    localStorage.setItem("isNarrowLayout", JSON.stringify(checked));
   };
 
   return (
@@ -126,11 +128,22 @@ const Index = () => {
       <Header 
         isMobileMenuOpen={isMobileMenuOpen}
         setIsMobileMenuOpen={setIsMobileMenuOpen}
-        handleAuthClick={handleAuthClick}
+        handleAuthClick={signOut}
       />
       <MobileMenu isOpen={isMobileMenuOpen} />
 
-      <main className="container mx-auto px-4 py-8">
+      <main className={`mx-auto px-4 py-8 ${isNarrow ? 'max-w-5xl border-x border-gray-200' : 'container'}`}>
+        <div className="flex justify-end mb-4">
+          <div className="flex items-center space-x-2">
+            <Switch
+              id="narrow-mode"
+              checked={isNarrow}
+              onCheckedChange={handleNarrowToggle}
+            />
+            <Label htmlFor="narrow-mode">Narrow Layout</Label>
+          </div>
+        </div>
+
         <div className="grid grid-cols-1 md:grid-cols-12 gap-8">
           <div className="md:col-span-8">
             <div className="space-y-6">

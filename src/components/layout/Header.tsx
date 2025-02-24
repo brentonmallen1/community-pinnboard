@@ -1,4 +1,3 @@
-
 import { NavigationMenu, NavigationMenuContent, NavigationMenuItem, NavigationMenuLink, NavigationMenuList, NavigationMenuTrigger } from "@/components/ui/navigation-menu";
 import { Button } from "@/components/ui/button";
 import { Menu, LogIn, LogOut, Home } from "lucide-react";
@@ -37,6 +36,13 @@ export const Header = ({ isMobileMenuOpen, setIsMobileMenuOpen, handleAuthClick 
     await signOut();
     navigate("/");
   };
+
+  const resourcesMenuItems = [
+    {
+      label: "Helpful Links",
+      href: "/helpful-links",
+    },
+  ];
 
   return (
     <header className="bg-white border-b border-gray-200">
@@ -125,16 +131,13 @@ export const Header = ({ isMobileMenuOpen, setIsMobileMenuOpen, handleAuthClick 
                     <NavigationMenuTrigger>Resources</NavigationMenuTrigger>
                     <NavigationMenuContent className="min-w-[200px]">
                       <div className="grid gap-1 p-2">
-                        <NavigationMenuLink asChild>
-                          <Link to="/helpful-links" className="block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground">
-                            Helpful Links
-                          </Link>
-                        </NavigationMenuLink>
-                        <NavigationMenuLink asChild>
-                          <Link to="/" className="block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground">
-                            Contact
-                          </Link>
-                        </NavigationMenuLink>
+                        {resourcesMenuItems.map((item, index) => (
+                          <NavigationMenuLink asChild key={index}>
+                            <Link to={item.href} className="block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground">
+                              {item.label}
+                            </Link>
+                          </NavigationMenuLink>
+                        ))}
                       </div>
                     </NavigationMenuContent>
                   </NavigationMenuItem>
