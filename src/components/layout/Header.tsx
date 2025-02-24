@@ -7,6 +7,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Badge } from "@/components/ui/badge";
+import { useState } from "react";
 
 interface HeaderProps {
   isMobileMenuOpen: boolean;
@@ -18,6 +19,7 @@ export const Header = ({ isMobileMenuOpen, setIsMobileMenuOpen, handleAuthClick 
   const { user, profile, signOut } = useAuth();
   const navigate = useNavigate();
   const isModeratorOrAdmin = profile?.role === "board_member" || profile?.role === "admin";
+  const [expandedMenu, setExpandedMenu] = useState<string | null>(null);
 
   const { data: pendingPostsCount } = useQuery({
     queryKey: ["pendingPostsCount"],
@@ -38,8 +40,17 @@ export const Header = ({ isMobileMenuOpen, setIsMobileMenuOpen, handleAuthClick 
     navigate("/");
   };
 
+  const handleMenuTriggerClick = (menuName: string) => {
+    setExpandedMenu(expandedMenu === menuName ? null : menuName);
+  };
+
+  // Close menu when clicking outside
+  const handleClickOutside = () => {
+    setExpandedMenu(null);
+  };
+
   return (
-    <header className="bg-white border-b border-gray-200">
+    <header className="bg-white border-b border-gray-200" onClick={handleClickOutside}>
       <div className="container mx-auto px-4">
         <div className="py-6 text-center">
           <Link to="/" className="hover:opacity-80">
@@ -54,7 +65,10 @@ export const Header = ({ isMobileMenuOpen, setIsMobileMenuOpen, handleAuthClick 
               <Button
                 variant="ghost"
                 size="icon"
-                onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setIsMobileMenuOpen(!isMobileMenuOpen);
+                }}
               >
                 <Menu className="h-6 w-6" />
               </Button>
@@ -88,7 +102,14 @@ export const Header = ({ isMobileMenuOpen, setIsMobileMenuOpen, handleAuthClick 
               <NavigationMenu>
                 <NavigationMenuList className="gap-2">
                   <NavigationMenuItem>
-                    <NavigationMenuTrigger className="relative">
+                    <NavigationMenuTrigger 
+                      className="relative"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleMenuTriggerClick('posts');
+                      }}
+                      data-state={expandedMenu === 'posts' ? 'open' : 'closed'}
+                    >
                       Posts
                       {isModeratorOrAdmin && pendingPostsCount && pendingPostsCount > 0 && (
                         <Badge variant="destructive" className="absolute -right-2 -top-2 min-w-[20px] h-5">
@@ -122,7 +143,15 @@ export const Header = ({ isMobileMenuOpen, setIsMobileMenuOpen, handleAuthClick 
                   </NavigationMenuItem>
                   
                   <NavigationMenuItem>
-                    <NavigationMenuTrigger>Resources</NavigationMenuTrigger>
+                    <NavigationMenuTrigger
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleMenuTriggerClick('resources');
+                      }}
+                      data-state={expandedMenu === 'resources' ? 'open' : 'closed'}
+                    >
+                      Resources
+                    </NavigationMenuTrigger>
                     <NavigationMenuContent className="min-w-[200px]">
                       <div className="grid gap-1 p-2">
                         <NavigationMenuLink asChild>
