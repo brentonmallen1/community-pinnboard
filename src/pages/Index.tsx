@@ -70,7 +70,7 @@ const Index = () => {
     queryKey: ["upcoming-events"],
     queryFn: async () => {
       const { data, error } = await supabase
-        .from("upcoming_events")
+        .from("events")
         .select("*")
         .gte("start_date", today.toISOString())
         .order("start_date", { ascending: true })
@@ -85,7 +85,7 @@ const Index = () => {
     queryKey: ["past-events"],
     queryFn: async () => {
       const { data, error } = await supabase
-        .from("upcoming_events")
+        .from("events")
         .select("*")
         .lt("end_date", today.toISOString())
         .order("end_date", { ascending: false })
