@@ -65,21 +65,14 @@ CREATE TABLE IF NOT EXISTS public.upcoming_events (
     updated_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL
 );
 
-CREATE TABLE IF NOT EXISTS public.quick_links (
+CREATE TABLE IF NOT EXISTS public.links (
     id uuid PRIMARY KEY DEFAULT uuid_generate_v4(),
     title TEXT NOT NULL,
     url TEXT NOT NULL,
-    order_index INTEGER DEFAULT 0 NOT NULL,
-    created_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL,
-    updated_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL
-);
-
-CREATE TABLE IF NOT EXISTS public.helpful_links (
-    id uuid PRIMARY KEY DEFAULT uuid_generate_v4(),
-    author_id uuid REFERENCES public.profiles(id) ON DELETE CASCADE NOT NULL,
-    title TEXT NOT NULL,
     description TEXT,
-    url TEXT NOT NULL,
+    is_quick_link BOOLEAN DEFAULT false,
+    order_index INTEGER DEFAULT 0,
+    author_id uuid REFERENCES public.profiles(id) ON DELETE CASCADE,
     created_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL,
     updated_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL
 );
