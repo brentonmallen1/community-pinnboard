@@ -21,6 +21,7 @@ const HelpfulLinks = () => {
             email
           )
         `)
+        .eq('is_quick_link', false)
         .order("created_at", { ascending: false });
       if (error) throw error;
       return data;
@@ -74,11 +75,6 @@ const HelpfulLinks = () => {
                   >
                     Visit Link
                   </a>
-                  {link.is_quick_link && (
-                    <span className="ml-2 inline-flex items-center rounded-full bg-blue-100 px-2.5 py-0.5 text-xs font-medium text-blue-800">
-                      Quick Link
-                    </span>
-                  )}
                   {link.profiles?.email && (
                     <p className="text-sm text-gray-500 mt-2">
                       Added by: {link.profiles.email}
