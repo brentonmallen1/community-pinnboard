@@ -33,6 +33,30 @@ export const Header = ({ isMobileMenuOpen, setIsMobileMenuOpen, handleAuthClick 
     enabled: isModeratorOrAdmin,
   });
 
+  const renderAuthButton = () => {
+    if (user) {
+      return (
+        <Button
+          variant="ghost"
+          onClick={handleAuthClick}
+          className="ml-4"
+        >
+          <LogOut className="h-4 w-4" />
+        </Button>
+      );
+    }
+    return (
+      <Button
+        variant="ghost"
+        onClick={() => navigate("/auth")}
+        className="ml-4"
+      >
+        <LogIn className="h-4 w-4 mr-2" />
+        Sign In
+      </Button>
+    );
+  };
+
   return (
     <header className="bg-white border-b border-gray-200">
       <div className="container mx-auto px-4">
@@ -152,24 +176,7 @@ export const Header = ({ isMobileMenuOpen, setIsMobileMenuOpen, handleAuthClick 
               </NavigationMenu>
             </div>
 
-            {user ? (
-              <Button
-                variant="ghost"
-                onClick={handleAuthClick}
-                className="ml-4"
-              >
-                <LogOut className="h-4 w-4" />
-              </Button>
-            ) : (
-              <Button
-                variant="ghost"
-                onClick={() => navigate("/auth")}
-                className="ml-4"
-              >
-                <LogIn className="h-4 w-4 mr-2" />
-                Sign In
-              </Button>
-            )}
+            {renderAuthButton()}
           </div>
         </nav>
       </div>
