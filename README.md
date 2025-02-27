@@ -1,8 +1,77 @@
+
 # Welcome to your Lovable project
 
 ## Project info
 
 **URL**: https://lovable.dev/projects/a5b63f80-93e3-47d9-a2f2-fd8f807bb440
+
+## Quick Start with Docker Compose
+
+The easiest way to get started is using Docker Compose. This will set up both the application and the database with all necessary configurations.
+
+### Prerequisites
+
+1. [Docker](https://docs.docker.com/get-docker/)
+2. [Docker Compose](https://docs.docker.com/compose/install/)
+
+### Setup Steps
+
+1. **Clone the repository**
+   ```sh
+   git clone <YOUR_GIT_URL>
+   cd <YOUR_PROJECT_NAME>
+   ```
+
+2. **Set up environment variables**
+   ```sh
+   cp .env.example .env
+   ```
+   Edit the `.env` file and fill in your Supabase credentials:
+   - `SUPABASE_URL`
+   - `SUPABASE_ANON_KEY`
+
+   The database credentials are pre-configured with default values, but you can modify them if needed:
+   - `POSTGRES_USER=postgres`
+   - `POSTGRES_PASSWORD=postgres`
+   - `POSTGRES_DB=app`
+
+3. **Start the application**
+   ```sh
+   docker compose up --build
+   ```
+
+   The application will be available at http://localhost:8080
+
+4. **First-time setup**
+   - The first user to sign up will automatically become an admin
+   - All subsequent users will be regular members
+
+### Development
+
+If you want to work on the application locally without Docker:
+
+1. **Install dependencies**
+   ```sh
+   npm i
+   ```
+
+2. **Start the development server**
+   ```sh
+   npm run dev
+   ```
+
+## Project Technologies
+
+This project is built with:
+
+- Vite
+- TypeScript
+- React
+- shadcn-ui
+- Tailwind CSS
+- Supabase
+- PostgreSQL
+- Docker
 
 ## How can I edit this code?
 
@@ -14,56 +83,22 @@ Simply visit the [Lovable Project](https://lovable.dev/projects/a5b63f80-93e3-47
 
 Changes made via Lovable will be committed automatically to this repo.
 
+**Use GitHub Codespaces**
+
+1. Navigate to the main page of your repository
+2. Click on the "Code" button (green button) near the top right
+3. Select the "Codespaces" tab
+4. Click on "New codespace" to launch a new Codespace environment
+5. Edit files directly within the Codespace and commit and push your changes
+
 **Use your preferred IDE**
 
 If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
 
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
-
-Follow these steps:
-
-```sh
-# Step 1: Clone the repository using the project's Git URL.
-git clone <YOUR_GIT_URL>
-
-# Step 2: Navigate to the project directory.
-cd <YOUR_PROJECT_NAME>
-
-# Step 3: Install the necessary dependencies.
-npm i
-
-# Step 4: Start the development server with auto-reloading and an instant preview.
-npm run dev
-```
-
-**Edit a file directly in GitHub**
-
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
-
-**Use GitHub Codespaces**
-
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
-
-## What technologies are used for this project?
-
-This project is built with .
-
-- Vite
-- TypeScript
-- React
-- shadcn-ui
-- Tailwind CSS
-
-## How can I deploy this project?
+## Deployment
 
 Simply open [Lovable](https://lovable.dev/projects/a5b63f80-93e3-47d9-a2f2-fd8f807bb440) and click on Share -> Publish.
 
-## I want to use a custom domain - is that possible?
+## Custom Domains
 
 We don't support custom domains (yet). If you want to deploy your project under your own domain then we recommend using Netlify. Visit our docs for more details: [Custom domains](https://docs.lovable.dev/tips-tricks/custom-domain/)
