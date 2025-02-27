@@ -11,6 +11,14 @@ import { AnnouncementsList } from "@/components/announcements/AnnouncementsList"
 import { CreateAnnouncementDialog } from "@/components/announcements/CreateAnnouncementDialog";
 import { PostsList } from "@/components/posts/PostsList";
 
+interface ExtendedSettings {
+  community_name: string;
+  created_at: string;
+  id: string;
+  updated_at: string;
+  narrow_layout?: boolean;
+}
+
 const Index = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isAddAnnouncementOpen, setIsAddAnnouncementOpen] = useState(false);
@@ -31,7 +39,7 @@ const Index = () => {
         .single();
 
       if (error) throw error;
-      return data;
+      return data as ExtendedSettings;
     },
   });
 

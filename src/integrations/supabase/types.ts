@@ -155,18 +155,21 @@ export type Database = {
           community_name: string
           created_at: string
           id: string
+          narrow_layout: boolean | null
           updated_at: string
         }
         Insert: {
           community_name?: string
           created_at?: string
           id?: string
+          narrow_layout?: boolean | null
           updated_at?: string
         }
         Update: {
           community_name?: string
           created_at?: string
           id?: string
+          narrow_layout?: boolean | null
           updated_at?: string
         }
         Relationships: []

@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useAuth } from "@/contexts/AuthContext";
@@ -14,6 +13,14 @@ import { useToast } from "@/hooks/use-toast";
 import type { Database } from "@/integrations/supabase/types";
 
 type UserRole = Database["public"]["Enums"]["user_role"];
+
+interface ExtendedSettings {
+  community_name: string;
+  created_at: string;
+  id: string;
+  updated_at: string;
+  narrow_layout?: boolean;
+}
 
 const AdminSettings = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -32,9 +39,10 @@ const AdminSettings = () => {
         .single();
 
       if (error) throw error;
-      setCommunityName(data.community_name);
-      setIsNarrowLayout(data.narrow_layout || false);
-      return data;
+      const extendedData = data as ExtendedSettings;
+      setCommunityName(extendedData.community_name);
+      setIsNarrowLayout(extendedData.narrow_layout || false);
+      return extendedData;
     },
   });
 
