@@ -10,7 +10,7 @@ const HelpfulLinks = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const { signOut, user } = useAuth();
   
-  // Query for helpful links
+  // Query for all links
   const { data: links, isLoading } = useQuery({
     queryKey: ["helpfulLinks"],
     queryFn: async () => {
@@ -22,7 +22,6 @@ const HelpfulLinks = () => {
             email
           )
         `)
-        .eq('is_quick_link', false)
         .order("created_at", { ascending: false });
       if (error) throw error;
       return data;
