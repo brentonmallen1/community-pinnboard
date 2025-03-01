@@ -1,4 +1,3 @@
-
 import { useQuery } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -154,15 +153,6 @@ export const Sidebar = () => {
             <div className="bg-white rounded-lg shadow p-6">
               <h3 className="text-xl font-serif font-bold mb-4">Quick Links</h3>
               <div className="space-y-2">
-                {user && (
-                  <Button 
-                    variant="ghost" 
-                    className="w-full justify-start"
-                    onClick={() => navigate("/submit-post")}
-                  >
-                    Submit a Post
-                  </Button>
-                )}
                 {quickLinks?.map((link) => (
                   <Button
                     key={link.id}

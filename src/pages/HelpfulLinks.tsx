@@ -1,14 +1,23 @@
 
 import { useState } from "react";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { supabase } from "@/integrations/supabase/client";
 import { Header } from "@/components/layout/Header";
 import { useAuth } from "@/contexts/AuthContext";
+import { AddLinkDialog } from "@/components/links/AddLinkDialog";
+import { useToast } from "@/hooks/use-toast";
 
 const HelpfulLinks = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [isAddLinkOpen, setIsAddLinkOpen] = useState(false);
+  const [title, setTitle] = useState("");
+  const [url, setUrl] = useState("");
+  const [description, setDescription] = useState("");
+  const [isQuickLink, setIsQuickLink] = useState(false);
   const { signOut, user } = useAuth();
+  const { toast } = useToast();
+  const queryClient = useQueryClient();
   
   // Query for all links
   const { data: links, isLoading } = useQuery({
@@ -42,6 +51,49 @@ const HelpfulLinks = () => {
     },
   });
 
+  // Mutation for adding a new link
+  const addLink = useMutation({
+    mutationFn: async () => {
+      const maxOrder = links
+        ?.filter(link => link.is_quick_link)
+        .reduce((max, link) => Math.max(max, link.order_index || 0), -1) ?? -1;
+      
+      const { error } = await supabase
+        .from("links")
+        .insert([{
+          title,
+          url,
+          description,
+          is_quick_link: isQuickLink,
+          order_index: isQuickLink ? maxOrder + 1 : null,
+          author_id: user?.id
+        }]);
+        
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["helpfulLinks"] });
+      queryClient.invalidateQueries({ queryKey: ["quickLinks"] });
+      setIsAddLinkOpen(false);
+      resetForm();
+      toast({ title: "Success", description: "Link added successfully" });
+    },
+    onError: () => {
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: "Failed to add link",
+      });
+    },
+  });
+
+  const resetForm = () => {
+    setTitle("");
+    setUrl("");
+    setDescription("");
+    setIsQuickLink(false);
+  };
+
   const handleAuthClick = async () => {
     if (user) {
       await signOut();
@@ -59,7 +111,25 @@ const HelpfulLinks = () => {
       />
 
       <main className={`container mx-auto px-4 py-8 ${isNarrow ? 'max-w-5xl bg-[#f3f3f3]' : ''}`}>
-        <h1 className="text-3xl font-serif font-bold mb-6">Helpful Links</h1>
+        <div className="flex justify-between items-center mb-6">
+          <h1 className="text-3xl font-serif font-bold">Helpful Links</h1>
+          {user && (
+            <AddLinkDialog
+              isOpen={isAddLinkOpen}
+              onOpenChange={setIsAddLinkOpen}
+              title={title}
+              url={url}
+              description={description}
+              isQuickLink={isQuickLink}
+              onTitleChange={setTitle}
+              onUrlChange={setUrl}
+              onDescriptionChange={setDescription}
+              onIsQuickLinkChange={setIsQuickLink}
+              onSubmit={() => addLink.mutate()}
+              isPending={addLink.isPending}
+            />
+          )}
+        </div>
         
         {isLoading ? (
           <div className="text-center py-8">
@@ -94,6 +164,11 @@ const HelpfulLinks = () => {
                       <p className="text-sm text-gray-500 mt-2">
                         Added by: {link.profiles.email}
                       </p>
+                    )}
+                    {link.is_quick_link && (
+                      <div className="mt-2 inline-flex items-center rounded-full bg-blue-100 px-2.5 py-0.5 text-xs font-medium text-blue-800">
+                        Quick Link
+                      </div>
                     )}
                   </CardContent>
                 </Card>
