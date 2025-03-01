@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
@@ -11,6 +12,7 @@ import AdminSettings from './pages/AdminSettings';
 import NotFound from './pages/NotFound';
 import { AuthProvider } from './contexts/AuthContext';
 import HelpfulLinks from './pages/HelpfulLinks';
+import Events from './pages/Events';
 
 const queryClient = new QueryClient();
 
@@ -27,6 +29,7 @@ function App() {
             <Route path="/dashboard" element={<Dashboard />} />
             <Route path="/admin/settings" element={<AdminSettings />} />
             <Route path="/helpful-links" element={<HelpfulLinks />} />
+            <Route path="/events" element={<Events />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </BrowserRouter>
