@@ -7,10 +7,19 @@ import { Header } from "@/components/layout/Header";
 import { useAuth } from "@/contexts/AuthContext";
 import { AddLinkDialog } from "@/components/links/AddLinkDialog";
 import { useToast } from "@/hooks/use-toast";
+import { MoreVertical, Pencil, Trash } from "lucide-react";
+import { 
+  DropdownMenu, 
+  DropdownMenuContent, 
+  DropdownMenuItem, 
+  DropdownMenuTrigger 
+} from "@/components/ui/dropdown-menu";
 
 const HelpfulLinks = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isAddLinkOpen, setIsAddLinkOpen] = useState(false);
+  const [isEditMode, setIsEditMode] = useState(false);
+  const [selectedLink, setSelectedLink] = useState<any>(null);
   const [title, setTitle] = useState("");
   const [url, setUrl] = useState("");
   const [description, setDescription] = useState("");
@@ -87,11 +96,98 @@ const HelpfulLinks = () => {
     },
   });
 
+  // Mutation for updating a link
+  const updateLink = useMutation({
+    mutationFn: async () => {
+      const { error } = await supabase
+        .from("links")
+        .update({
+          title,
+          url,
+          description,
+          is_quick_link: isQuickLink,
+          updated_at: new Date().toISOString()
+        })
+        .eq("id", selectedLink.id);
+        
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["helpfulLinks"] });
+      queryClient.invalidateQueries({ queryKey: ["quickLinks"] });
+      setIsAddLinkOpen(false);
+      resetForm();
+      toast({ title: "Success", description: "Link updated successfully" });
+    },
+    onError: () => {
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: "Failed to update link",
+      });
+    },
+  });
+
+  // Mutation for deleting a link
+  const deleteLink = useMutation({
+    mutationFn: async (linkId: string) => {
+      const { error } = await supabase
+        .from("links")
+        .delete()
+        .eq("id", linkId);
+        
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["helpfulLinks"] });
+      queryClient.invalidateQueries({ queryKey: ["quickLinks"] });
+      toast({ title: "Success", description: "Link deleted successfully" });
+    },
+    onError: () => {
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: "Failed to delete link",
+      });
+    },
+  });
+
   const resetForm = () => {
     setTitle("");
     setUrl("");
     setDescription("");
     setIsQuickLink(false);
+    setSelectedLink(null);
+    setIsEditMode(false);
+  };
+
+  const handleOpenAddDialog = () => {
+    resetForm();
+    setIsAddLinkOpen(true);
+  };
+
+  const handleOpenEditDialog = (link: any) => {
+    setSelectedLink(link);
+    setTitle(link.title);
+    setUrl(link.url);
+    setDescription(link.description || "");
+    setIsQuickLink(link.is_quick_link || false);
+    setIsEditMode(true);
+    setIsAddLinkOpen(true);
+  };
+
+  const handleDeleteLink = (linkId: string) => {
+    if (window.confirm("Are you sure you want to delete this link?")) {
+      deleteLink.mutate(linkId);
+    }
+  };
+
+  const handleSubmit = () => {
+    if (isEditMode) {
+      updateLink.mutate();
+    } else {
+      addLink.mutate();
+    }
   };
 
   const handleAuthClick = async () => {
@@ -101,6 +197,29 @@ const HelpfulLinks = () => {
   };
 
   const isNarrow = settings?.narrow_layout || false;
+
+  const linkCardContent = (link: any) => (
+    <>
+      <CardHeader>
+        <CardTitle className="text-xl">{link.title}</CardTitle>
+        {link.description && (
+          <p className="text-sm text-gray-600 mt-2">{link.description}</p>
+        )}
+      </CardHeader>
+      <CardContent>
+        {link.profiles?.email && (
+          <p className="text-sm text-gray-500 mt-2">
+            Added by: {link.profiles.email}
+          </p>
+        )}
+        {link.is_quick_link && (
+          <div className="mt-2 inline-flex items-center rounded-full bg-blue-100 px-2.5 py-0.5 text-xs font-medium text-blue-800">
+            Quick Link
+          </div>
+        )}
+      </CardContent>
+    </>
+  );
 
   return (
     <div className={`min-h-screen ${isNarrow ? 'bg-[#222222]' : 'bg-[#f3f3f3]'}`}>
@@ -125,8 +244,9 @@ const HelpfulLinks = () => {
               onUrlChange={setUrl}
               onDescriptionChange={setDescription}
               onIsQuickLinkChange={setIsQuickLink}
-              onSubmit={() => addLink.mutate()}
-              isPending={addLink.isPending}
+              onSubmit={handleSubmit}
+              isPending={isEditMode ? updateLink.isPending : addLink.isPending}
+              isEditMode={isEditMode}
             />
           )}
         </div>
@@ -145,34 +265,39 @@ const HelpfulLinks = () => {
         ) : (
           <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
             {links.map((link) => (
-              <a
-                key={link.id}
-                href={link.url}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="block transition-transform hover:scale-[1.02]"
-              >
-                <Card className="h-full hover:shadow-lg transition-shadow cursor-pointer">
-                  <CardHeader>
-                    <CardTitle className="text-xl">{link.title}</CardTitle>
-                    {link.description && (
-                      <p className="text-sm text-gray-600 mt-2">{link.description}</p>
-                    )}
-                  </CardHeader>
-                  <CardContent>
-                    {link.profiles?.email && (
-                      <p className="text-sm text-gray-500 mt-2">
-                        Added by: {link.profiles.email}
-                      </p>
-                    )}
-                    {link.is_quick_link && (
-                      <div className="mt-2 inline-flex items-center rounded-full bg-blue-100 px-2.5 py-0.5 text-xs font-medium text-blue-800">
-                        Quick Link
-                      </div>
-                    )}
-                  </CardContent>
-                </Card>
-              </a>
+              <Card key={link.id} className="h-full hover:shadow-lg transition-shadow relative">
+                {user && (
+                  <div className="absolute top-2 right-2 z-10">
+                    <DropdownMenu>
+                      <DropdownMenuTrigger className="p-1 rounded-full hover:bg-gray-100 focus:outline-none">
+                        <MoreVertical className="h-5 w-5 text-gray-500" />
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent>
+                        <DropdownMenuItem onClick={() => handleOpenEditDialog(link)}>
+                          <Pencil className="h-4 w-4 mr-2" />
+                          Edit
+                        </DropdownMenuItem>
+                        <DropdownMenuItem 
+                          className="text-red-600" 
+                          onClick={() => handleDeleteLink(link.id)}
+                        >
+                          <Trash className="h-4 w-4 mr-2" />
+                          Delete
+                        </DropdownMenuItem>
+                      </DropdownMenuContent>
+                    </DropdownMenu>
+                  </div>
+                )}
+                <a
+                  href={link.url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="block h-full"
+                  onClick={(e) => user && e.currentTarget !== e.target && e.preventDefault()}
+                >
+                  {linkCardContent(link)}
+                </a>
+              </Card>
             ))}
           </div>
         )}

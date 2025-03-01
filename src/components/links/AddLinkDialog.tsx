@@ -20,6 +20,7 @@ interface AddLinkDialogProps {
   onIsQuickLinkChange: (isQuickLink: boolean) => void;
   onSubmit: () => void;
   isPending: boolean;
+  isEditMode?: boolean;
 }
 
 export const AddLinkDialog = ({
@@ -34,7 +35,8 @@ export const AddLinkDialog = ({
   onDescriptionChange,
   onIsQuickLinkChange,
   onSubmit,
-  isPending
+  isPending,
+  isEditMode = false
 }: AddLinkDialogProps) => {
   return (
     <Dialog open={isOpen} onOpenChange={onOpenChange}>
@@ -46,7 +48,7 @@ export const AddLinkDialog = ({
       </DialogTrigger>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>Add New Link</DialogTitle>
+          <DialogTitle>{isEditMode ? "Edit Link" : "Add New Link"}</DialogTitle>
         </DialogHeader>
         <form onSubmit={(e) => { e.preventDefault(); onSubmit(); }} className="space-y-4 mt-4">
           <div className="space-y-2">
@@ -105,7 +107,7 @@ export const AddLinkDialog = ({
             disabled={!title || !url || isPending}
             className="w-full"
           >
-            {isPending ? "Adding..." : "Add Link"}
+            {isPending ? (isEditMode ? "Updating..." : "Adding...") : (isEditMode ? "Update Link" : "Add Link")}
           </Button>
         </form>
       </DialogContent>
