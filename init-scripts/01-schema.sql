@@ -5,6 +5,7 @@ CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
 -- Create custom types
 CREATE TYPE user_role AS ENUM ('member', 'board_member', 'admin');
 CREATE TYPE post_status AS ENUM ('pending', 'approved', 'rejected');
+CREATE TYPE email_status AS ENUM ('pending', 'sent', 'failed');
 
 -- Create auth schema and users table (simplified version of what Supabase provides)
 CREATE SCHEMA IF NOT EXISTS auth;
@@ -95,4 +96,38 @@ CREATE TABLE IF NOT EXISTS public.community_settings (
     community_name TEXT DEFAULT 'Community Bulletin Board' NOT NULL,
     created_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL,
     updated_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL
+);
+
+-- Email-related tables
+CREATE TABLE IF NOT EXISTS public.email_subscriptions (
+    id uuid PRIMARY KEY DEFAULT uuid_generate_v4(),
+    user_id uuid REFERENCES public.profiles(id) ON DELETE CASCADE,
+    notify_on_announcements boolean DEFAULT false,
+    notify_on_posts boolean DEFAULT false,
+    notify_on_events boolean DEFAULT false,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL,
+    updated_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL,
+    UNIQUE(user_id)
+);
+
+CREATE TABLE IF NOT EXISTS public.email_templates (
+    id uuid PRIMARY KEY DEFAULT uuid_generate_v4(),
+    template_name TEXT UNIQUE NOT NULL,
+    subject_template TEXT NOT NULL,
+    body_template TEXT NOT NULL,
+    description TEXT,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL,
+    updated_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS public.email_queue (
+    id uuid PRIMARY KEY DEFAULT uuid_generate_v4(),
+    recipient_email TEXT NOT NULL,
+    subject TEXT NOT NULL,
+    content TEXT NOT NULL,
+    status email_status DEFAULT 'pending',
+    attempts INTEGER DEFAULT 0,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL,
+    sent_at TIMESTAMP WITH TIME ZONE,
+    error_message TEXT
 );
