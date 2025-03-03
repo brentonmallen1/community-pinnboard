@@ -28,7 +28,7 @@ function App() {
             <Route path="/posts" element={<BrowsePosts />} />
             <Route path="/dashboard" element={<Dashboard />} />
             <Route path="/admin/settings" element={<AdminSettings />} />
-            <Route path="/helpful-links" element={<HelpfulLinks />} />
+            <Route path="/links" element={<HelpfulLinks />} />
             <Route path="/events" element={<Events />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
