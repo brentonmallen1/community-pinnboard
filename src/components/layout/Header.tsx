@@ -1,22 +1,39 @@
 
-import { NavigationMenu, NavigationMenuContent, NavigationMenuItem, NavigationMenuLink, NavigationMenuList, NavigationMenuTrigger } from "@/components/ui/navigation-menu";
-import { Button } from "@/components/ui/button";
-import { Menu, LogIn, LogOut, Home } from "lucide-react";
+import { Link } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
-import { Link, useNavigate } from "react-router-dom";
+import { Button } from "@/components/ui/button";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-import { Badge } from "@/components/ui/badge";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import {
+  NavigationMenu,
+  NavigationMenuContent,
+  NavigationMenuItem,
+  NavigationMenuLink,
+  NavigationMenuList,
+  NavigationMenuTrigger,
+} from "@/components/ui/navigation-menu";
+import { cn } from "@/lib/utils";
+import { useMemo } from "react";
 
 interface HeaderProps {
   isMobileMenuOpen: boolean;
-  setIsMobileMenuOpen: (isOpen: boolean) => void;
+  setIsMobileMenuOpen: (value: boolean) => void;
   handleAuthClick: () => void;
 }
 
-export const Header = ({ isMobileMenuOpen, setIsMobileMenuOpen, handleAuthClick }: HeaderProps) => {
+export const Header = ({
+  isMobileMenuOpen,
+  setIsMobileMenuOpen,
+  handleAuthClick,
+}: HeaderProps) => {
   const { user, profile } = useAuth();
-  const navigate = useNavigate();
+  const isAdmin = profile?.role === "admin";
   const isModeratorOrAdmin = profile?.role === "board_member" || profile?.role === "admin";
 
   const { data: settings } = useQuery({
@@ -32,169 +49,167 @@ export const Header = ({ isMobileMenuOpen, setIsMobileMenuOpen, handleAuthClick 
     },
   });
 
-  const { data: pendingPostsCount } = useQuery({
-    queryKey: ["pendingPostsCount"],
-    queryFn: async () => {
-      const { count, error } = await supabase
-        .from("community_posts")
-        .select("*", { count: 'exact', head: true })
-        .eq("status", "pending");
-
-      if (error) throw error;
-      return count || 0;
-    },
-    enabled: isModeratorOrAdmin,
-  });
-
   const communityName = settings?.community_name || "Community Bulletin Board";
   const communitySubtitle = settings?.subtitle || "Your Source for Local Updates and Announcements";
 
-  const renderAuthButton = () => {
+  const navigationItems = useMemo(() => {
+    const items = [
+      {
+        name: "Home",
+        href: "/",
+      },
+      {
+        name: "Posts",
+        href: "/posts",
+      },
+      {
+        name: "Events",
+        href: "/events",
+      },
+      {
+        name: "Helpful Links",
+        href: "/links",
+      },
+    ];
+
     if (user) {
-      return (
-        <Button
-          variant="ghost"
-          onClick={handleAuthClick}
-          className="ml-4"
-        >
-          <LogOut className="h-4 w-4" />
-        </Button>
-      );
+      items.push({
+        name: "Submit Post",
+        href: "/submit",
+      });
     }
-    return (
-      <Button
-        variant="ghost"
-        onClick={() => navigate("/auth")}
-        className="ml-4"
-      >
-        <LogIn className="h-4 w-4 mr-2" />
-        Sign In
-      </Button>
-    );
-  };
+
+    if (isModeratorOrAdmin) {
+      items.push({
+        name: "Dashboard",
+        href: "/dashboard",
+      });
+    }
+
+    if (isAdmin) {
+      items.push({
+        name: "Settings",
+        href: "/admin/settings",
+      });
+    }
+
+    return items;
+  }, [user, isModeratorOrAdmin, isAdmin]);
 
   return (
-    <header className="bg-white border-b border-gray-200">
+    <header className="bg-white shadow-sm">
       <div className="container mx-auto px-4">
-        <div className="py-6 text-center">
-          <Link to="/" className="hover:opacity-80">
-            <h1 className="text-4xl font-serif font-bold text-[#222222]">{communityName}</h1>
-            <p className="mt-2 text-[#222222]">{communitySubtitle}</p>
-          </Link>
-        </div>
-        
-        <nav className="py-4">
-          <div className="flex justify-between items-center md:hidden">
-            <div className="flex items-center gap-2">
-              <Button
-                variant="ghost"
-                size="icon"
-                onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-              >
-                <Menu className="h-6 w-6" />
-              </Button>
-              <Button
-                variant="ghost"
-                size="icon"
-                onClick={() => navigate("/")}
-              >
-                <Home className="h-6 w-6" />
-              </Button>
-            </div>
+        <div className="h-16 flex items-center justify-between">
+          <div className="flex-shrink-0">
+            <Link to="/" className="flex flex-col">
+              <h1 className="text-xl font-serif font-bold text-[#222222]">
+                {communityName}
+              </h1>
+              <p className="text-xs text-gray-500">{communitySubtitle}</p>
+            </Link>
+          </div>
+
+          <div className="md:flex items-center gap-4 hidden">
+            <NavigationMenu>
+              <NavigationMenuList>
+                <NavigationMenuItem>
+                  <NavigationMenuTrigger>Menu</NavigationMenuTrigger>
+                  <NavigationMenuContent>
+                    <ul className="grid w-[400px] gap-3 p-4 md:grid-cols-2">
+                      {navigationItems.map((item) => (
+                        <li key={item.name}>
+                          <Link
+                            to={item.href}
+                            className={cn(
+                              "block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-gray-100 focus:bg-gray-100"
+                            )}
+                          >
+                            <div className="text-sm font-medium leading-none">
+                              {item.name}
+                            </div>
+                          </Link>
+                        </li>
+                      ))}
+                    </ul>
+                  </NavigationMenuContent>
+                </NavigationMenuItem>
+              </NavigationMenuList>
+            </NavigationMenu>
+
             {user ? (
-              <Button
-                variant="ghost"
-                size="icon"
-                onClick={handleAuthClick}
-              >
-                <LogOut className="h-6 w-6" />
-              </Button>
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="ghost" size="icon">
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="2"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      className="h-5 w-5"
+                    >
+                      <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
+                      <polyline points="16 17 21 12 16 7" />
+                      <line x1="21" y1="12" x2="9" y2="12" />
+                    </svg>
+                    <span className="sr-only">Log out</span>
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end">
+                  <DropdownMenuItem onClick={handleAuthClick}>
+                    Log out
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
             ) : (
-              <Button
-                variant="ghost"
-                onClick={() => navigate("/auth")}
-              >
-                <LogIn className="h-4 w-4 mr-2" />
+              <Button onClick={handleAuthClick} variant="ghost">
                 Sign In
               </Button>
             )}
           </div>
-          
-          <div className="hidden md:flex justify-between items-center">
-            <div className="flex items-center gap-2">
-              <Button
-                variant="ghost"
-                size="icon"
-                onClick={() => navigate("/")}
-                className="mr-2"
-              >
-                <Home className="h-5 w-5" />
-              </Button>
-              <NavigationMenu>
-                <NavigationMenuList className="gap-2">
-                  <NavigationMenuItem>
-                    <NavigationMenuTrigger className="relative">
-                      Posts
-                      {isModeratorOrAdmin && pendingPostsCount && pendingPostsCount > 0 && (
-                        <Badge variant="destructive" className="absolute -right-2 -top-2 min-w-[20px] h-5">
-                          {pendingPostsCount}
-                        </Badge>
-                      )}
-                    </NavigationMenuTrigger>
-                    <NavigationMenuContent className="min-w-[200px]">
-                      <div className="grid gap-1 p-2">
-                        <NavigationMenuLink asChild>
-                          <Link to="/posts" className="block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground">
-                            Browse Posts
-                          </Link>
-                        </NavigationMenuLink>
-                        {user && (
-                          <NavigationMenuLink asChild>
-                            <Link to="/submit-post" className="block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground">
-                              Submit Post
-                            </Link>
-                          </NavigationMenuLink>
-                        )}
-                        {isModeratorOrAdmin && (
-                          <NavigationMenuLink asChild>
-                            <Link to="/dashboard" className="block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground">
-                              Manage Posts {pendingPostsCount && pendingPostsCount > 0 && `(${pendingPostsCount})`}
-                            </Link>
-                          </NavigationMenuLink>
-                        )}
-                      </div>
-                    </NavigationMenuContent>
-                  </NavigationMenuItem>
-                  
-                  <NavigationMenuItem>
-                    <NavigationMenuTrigger>Resources</NavigationMenuTrigger>
-                    <NavigationMenuContent className="min-w-[200px]">
-                      <div className="grid gap-1 p-2">
-                        <NavigationMenuLink asChild>
-                          <Link to="/helpful-links" className="block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground">
-                            Helpful Links
-                          </Link>
-                        </NavigationMenuLink>
-                      </div>
-                    </NavigationMenuContent>
-                  </NavigationMenuItem>
 
-                  {profile?.role === "admin" && (
-                    <NavigationMenuItem>
-                      <NavigationMenuLink asChild>
-                        <Link to="/admin/settings" className="block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground">
-                          Settings
-                        </Link>
-                      </NavigationMenuLink>
-                    </NavigationMenuItem>
-                  )}
-                </NavigationMenuList>
-              </NavigationMenu>
-            </div>
-
-            {renderAuthButton()}
+          <div className="md:hidden">
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+            >
+              {isMobileMenuOpen ? (
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  className="h-6 w-6"
+                >
+                  <line x1="18" y1="6" x2="6" y2="18" />
+                  <line x1="6" y1="6" x2="18" y2="18" />
+                </svg>
+              ) : (
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  className="h-6 w-6"
+                >
+                  <line x1="4" y1="12" x2="20" y2="12" />
+                  <line x1="4" y1="6" x2="20" y2="6" />
+                  <line x1="4" y1="18" x2="20" y2="18" />
+                </svg>
+              )}
+              <span className="sr-only">Toggle menu</span>
+            </Button>
           </div>
-        </nav>
+        </div>
       </div>
     </header>
   );

@@ -1,9 +1,9 @@
-
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import { Header } from "@/components/layout/Header";
 import { MobileMenu } from "@/components/layout/MobileMenu";
+import { Footer } from "@/components/layout/Footer";
 import { PendingPosts } from "@/components/posts/PendingPosts";
 import { ManageAnnouncements } from "@/components/announcements/ManageAnnouncements";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -26,7 +26,7 @@ const Dashboard = () => {
   }
 
   return (
-    <div className="min-h-screen bg-[#f3f3f3]">
+    <div className="min-h-screen bg-[#f3f3f3] flex flex-col">
       <Header 
         isMobileMenuOpen={isMobileMenuOpen}
         setIsMobileMenuOpen={setIsMobileMenuOpen}
@@ -34,7 +34,7 @@ const Dashboard = () => {
       />
       <MobileMenu isOpen={isMobileMenuOpen} />
 
-      <main className="container mx-auto px-4 py-8">
+      <main className="container mx-auto px-4 py-8 flex-grow">
         <Tabs defaultValue="posts" className="space-y-6">
           <TabsList>
             <TabsTrigger value="posts">Manage Posts</TabsTrigger>
@@ -61,6 +61,7 @@ const Dashboard = () => {
           </TabsContent>
         </Tabs>
       </main>
+      <Footer />
     </div>
   );
 };

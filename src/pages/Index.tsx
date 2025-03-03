@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 import { useNavigate } from "react-router-dom";
@@ -152,7 +151,6 @@ const Index = () => {
             <div className="grid grid-cols-1 md:grid-cols-12 gap-8 py-8">
               <div className="md:col-span-8">
                 <div className="space-y-6">
-                  {/* Announcements Section */}
                   <div>
                     <div className="flex justify-between items-center mb-4">
                       <h2 className="text-2xl font-serif font-bold text-[#222222]">Announcements</h2>
@@ -176,7 +174,6 @@ const Index = () => {
                     />
                   </div>
 
-                  {/* Posts Section */}
                   <PostsList posts={posts} isLoading={isLoadingPosts} />
                 </div>
               </div>

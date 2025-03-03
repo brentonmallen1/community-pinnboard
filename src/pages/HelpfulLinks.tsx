@@ -1,9 +1,9 @@
-
 import { useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { supabase } from "@/integrations/supabase/client";
 import { Header } from "@/components/layout/Header";
+import { Footer } from "@/components/layout/Footer";
 import { useAuth } from "@/contexts/AuthContext";
 import { AddLinkDialog } from "@/components/links/AddLinkDialog";
 import { useToast } from "@/hooks/use-toast";
@@ -28,7 +28,6 @@ const HelpfulLinks = () => {
   const { toast } = useToast();
   const queryClient = useQueryClient();
   
-  // Query for all links
   const { data: links, isLoading } = useQuery({
     queryKey: ["helpfulLinks"],
     queryFn: async () => {
@@ -46,7 +45,6 @@ const HelpfulLinks = () => {
     },
   });
 
-  // Query for settings
   const { data: settings } = useQuery({
     queryKey: ["settings"],
     queryFn: async () => {
@@ -60,7 +58,6 @@ const HelpfulLinks = () => {
     },
   });
 
-  // Mutation for adding a new link
   const addLink = useMutation({
     mutationFn: async () => {
       const maxOrder = links
@@ -96,7 +93,6 @@ const HelpfulLinks = () => {
     },
   });
 
-  // Mutation for updating a link
   const updateLink = useMutation({
     mutationFn: async () => {
       const { error } = await supabase
@@ -128,7 +124,6 @@ const HelpfulLinks = () => {
     },
   });
 
-  // Mutation for deleting a link
   const deleteLink = useMutation({
     mutationFn: async (linkId: string) => {
       const { error } = await supabase
@@ -222,14 +217,14 @@ const HelpfulLinks = () => {
   );
 
   return (
-    <div className={`min-h-screen ${isNarrow ? 'bg-[#222222]' : 'bg-[#f3f3f3]'}`}>
+    <div className={`min-h-screen ${isNarrow ? 'bg-[#222222]' : 'bg-[#f3f3f3]'} flex flex-col`}>
       <Header
         isMobileMenuOpen={isMobileMenuOpen}
         setIsMobileMenuOpen={setIsMobileMenuOpen}
         handleAuthClick={handleAuthClick}
       />
 
-      <main className={`container mx-auto px-4 py-8 ${isNarrow ? 'max-w-5xl bg-[#f3f3f3]' : ''}`}>
+      <main className={`container mx-auto px-4 py-8 flex-grow ${isNarrow ? 'max-w-5xl bg-[#f3f3f3]' : ''}`}>
         <div className="flex justify-between items-center mb-6">
           <h1 className="text-3xl font-serif font-bold">Helpful Links</h1>
           {user && (
@@ -302,6 +297,7 @@ const HelpfulLinks = () => {
           </div>
         )}
       </main>
+      <Footer />
     </div>
   );
 };

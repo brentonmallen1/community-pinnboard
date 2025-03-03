@@ -1,9 +1,9 @@
-
 import { useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useAuth } from "@/contexts/AuthContext";
 import { Header } from "@/components/layout/Header";
 import { MobileMenu } from "@/components/layout/MobileMenu";
+import { Footer } from "@/components/layout/Footer";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -85,7 +85,7 @@ const BrowsePosts = () => {
   if (error) {
     console.error("Error in posts query:", error);
     return (
-      <div className="min-h-screen bg-[#f3f3f3]">
+      <div className="min-h-screen bg-[#f3f3f3] flex flex-col">
         <Header 
           isMobileMenuOpen={isMobileMenuOpen}
           setIsMobileMenuOpen={setIsMobileMenuOpen}
@@ -98,12 +98,13 @@ const BrowsePosts = () => {
             <pre className="mt-2 text-sm">{JSON.stringify(error, null, 2)}</pre>
           </div>
         </main>
+        <Footer />
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-[#f3f3f3]">
+    <div className="min-h-screen bg-[#f3f3f3] flex flex-col">
       <Header 
         isMobileMenuOpen={isMobileMenuOpen}
         setIsMobileMenuOpen={setIsMobileMenuOpen}
@@ -111,7 +112,7 @@ const BrowsePosts = () => {
       />
       <MobileMenu isOpen={isMobileMenuOpen} />
 
-      <main className="container mx-auto px-4 py-8">
+      <main className="container mx-auto px-4 py-8 flex-grow">
         <div className="space-y-8">
           <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
             <div>
@@ -166,6 +167,7 @@ const BrowsePosts = () => {
           )}
         </div>
       </main>
+      <Footer />
     </div>
   );
 };

@@ -156,6 +156,7 @@ export type Database = {
           created_at: string
           id: string
           narrow_layout: boolean | null
+          subtitle: string
           updated_at: string
         }
         Insert: {
@@ -163,6 +164,7 @@ export type Database = {
           created_at?: string
           id?: string
           narrow_layout?: boolean | null
+          subtitle?: string
           updated_at?: string
         }
         Update: {
@@ -170,6 +172,7 @@ export type Database = {
           created_at?: string
           id?: string
           narrow_layout?: boolean | null
+          subtitle?: string
           updated_at?: string
         }
         Relationships: []
