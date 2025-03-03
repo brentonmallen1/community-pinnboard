@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 import { useNavigate } from "react-router-dom";
@@ -5,6 +6,7 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { Header } from "@/components/layout/Header";
 import { MobileMenu } from "@/components/layout/MobileMenu";
 import { Sidebar } from "@/components/layout/Sidebar";
+import { Footer } from "@/components/layout/Footer";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { AnnouncementsList } from "@/components/announcements/AnnouncementsList";
@@ -136,7 +138,7 @@ const Index = () => {
   const isNarrow = settings?.narrow_layout || false;
 
   return (
-    <div className={`min-h-screen ${isNarrow ? 'bg-[#222222]' : 'bg-[#f3f3f3]'}`}>
+    <div className={`min-h-screen ${isNarrow ? 'bg-[#222222]' : 'bg-[#f3f3f3]'} flex flex-col`}>
       <Header 
         isMobileMenuOpen={isMobileMenuOpen}
         setIsMobileMenuOpen={setIsMobileMenuOpen}
@@ -144,7 +146,7 @@ const Index = () => {
       />
       <MobileMenu isOpen={isMobileMenuOpen} />
 
-      <main className="min-h-[calc(100vh-4rem)] mx-auto flex flex-col">
+      <main className="flex-grow">
         <div className={`flex-1 ${isNarrow ? 'max-w-5xl mx-auto bg-[#f3f3f3]' : 'container'}`}>
           <div className={`h-full ${isNarrow ? 'px-4' : ''}`}>
             <div className="grid grid-cols-1 md:grid-cols-12 gap-8 py-8">
@@ -183,6 +185,7 @@ const Index = () => {
           </div>
         </div>
       </main>
+      <Footer />
     </div>
   );
 };

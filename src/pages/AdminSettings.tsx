@@ -1,8 +1,10 @@
+
 import { useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useAuth } from "@/contexts/AuthContext";
 import { Header } from "@/components/layout/Header";
 import { MobileMenu } from "@/components/layout/MobileMenu";
+import { Footer } from "@/components/layout/Footer";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -16,6 +18,7 @@ type UserRole = Database["public"]["Enums"]["user_role"];
 
 interface ExtendedSettings {
   community_name: string;
+  subtitle: string;
   created_at: string;
   id: string;
   updated_at: string;
@@ -27,6 +30,7 @@ const AdminSettings = () => {
   const { user, profile, signOut } = useAuth();
   const { toast } = useToast();
   const [communityName, setCommunityName] = useState("");
+  const [communitySubtitle, setCommunitySubtitle] = useState("");
   const queryClient = useQueryClient();
   const [isNarrowLayout, setIsNarrowLayout] = useState(false);
 
@@ -41,6 +45,7 @@ const AdminSettings = () => {
       if (error) throw error;
       const extendedData = data as ExtendedSettings;
       setCommunityName(extendedData.community_name);
+      setCommunitySubtitle(extendedData.subtitle || "Your Source for Local Updates and Announcements");
       setIsNarrowLayout(extendedData.narrow_layout || false);
       return extendedData;
     },
@@ -63,6 +68,7 @@ const AdminSettings = () => {
       .from("community_settings")
       .update({ 
         community_name: communityName,
+        subtitle: communitySubtitle,
         narrow_layout: isNarrowLayout 
       })
       .eq("id", settings?.id);
@@ -110,7 +116,7 @@ const AdminSettings = () => {
   }
 
   return (
-    <div className="min-h-screen bg-[#f3f3f3]">
+    <div className="min-h-screen bg-[#f3f3f3] flex flex-col">
       <Header 
         isMobileMenuOpen={isMobileMenuOpen}
         setIsMobileMenuOpen={setIsMobileMenuOpen}
@@ -118,7 +124,7 @@ const AdminSettings = () => {
       />
       <MobileMenu isOpen={isMobileMenuOpen} />
 
-      <main className="container mx-auto px-4 py-8">
+      <main className="container mx-auto px-4 py-8 flex-grow">
         <div className="space-y-8">
           <Card>
             <CardHeader>
@@ -133,6 +139,15 @@ const AdminSettings = () => {
                   <Input
                     value={communityName}
                     onChange={(e) => setCommunityName(e.target.value)}
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium mb-1 text-[#222222]">
+                    Community Subtitle
+                  </label>
+                  <Input
+                    value={communitySubtitle}
+                    onChange={(e) => setCommunitySubtitle(e.target.value)}
                   />
                 </div>
                 <div className="flex items-center space-x-2">
@@ -187,6 +202,7 @@ const AdminSettings = () => {
           </Card>
         </div>
       </main>
+      <Footer />
     </div>
   );
 };

@@ -19,6 +19,19 @@ export const Header = ({ isMobileMenuOpen, setIsMobileMenuOpen, handleAuthClick 
   const navigate = useNavigate();
   const isModeratorOrAdmin = profile?.role === "board_member" || profile?.role === "admin";
 
+  const { data: settings } = useQuery({
+    queryKey: ["settings"],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("community_settings")
+        .select("*")
+        .single();
+
+      if (error) throw error;
+      return data;
+    },
+  });
+
   const { data: pendingPostsCount } = useQuery({
     queryKey: ["pendingPostsCount"],
     queryFn: async () => {
@@ -32,6 +45,9 @@ export const Header = ({ isMobileMenuOpen, setIsMobileMenuOpen, handleAuthClick 
     },
     enabled: isModeratorOrAdmin,
   });
+
+  const communityName = settings?.community_name || "Community Bulletin Board";
+  const communitySubtitle = settings?.subtitle || "Your Source for Local Updates and Announcements";
 
   const renderAuthButton = () => {
     if (user) {
@@ -62,8 +78,8 @@ export const Header = ({ isMobileMenuOpen, setIsMobileMenuOpen, handleAuthClick 
       <div className="container mx-auto px-4">
         <div className="py-6 text-center">
           <Link to="/" className="hover:opacity-80">
-            <h1 className="text-4xl font-serif font-bold text-[#222222]">Community Bulletin Board</h1>
-            <p className="mt-2 text-[#222222]">Your Source for Local Updates and Announcements</p>
+            <h1 className="text-4xl font-serif font-bold text-[#222222]">{communityName}</h1>
+            <p className="mt-2 text-[#222222]">{communitySubtitle}</p>
           </Link>
         </div>
         
@@ -183,4 +199,3 @@ export const Header = ({ isMobileMenuOpen, setIsMobileMenuOpen, handleAuthClick 
     </header>
   );
 };
-
