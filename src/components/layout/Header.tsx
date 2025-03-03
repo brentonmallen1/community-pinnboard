@@ -1,4 +1,3 @@
-
 import { Link } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import { Button } from "@/components/ui/button";
@@ -27,6 +26,15 @@ interface HeaderProps {
   handleAuthClick: () => void;
 }
 
+interface ExtendedSettings {
+  community_name: string;
+  subtitle: string;
+  created_at: string;
+  id: string;
+  updated_at: string;
+  narrow_layout?: boolean;
+}
+
 export const Header = ({
   isMobileMenuOpen,
   setIsMobileMenuOpen,
@@ -45,7 +53,7 @@ export const Header = ({
         .single();
 
       if (error) throw error;
-      return data;
+      return data as ExtendedSettings;
     },
   });
 
