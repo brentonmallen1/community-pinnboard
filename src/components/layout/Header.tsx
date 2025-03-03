@@ -183,3 +183,4 @@ export const Header = ({ isMobileMenuOpen, setIsMobileMenuOpen, handleAuthClick 
     </header>
   );
 };
+
